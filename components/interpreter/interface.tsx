@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { MouseEventHandler, useEffect, useRef, useState } from "react";
 import { Program } from "./program";
 
 interface InterpreterProps {
@@ -16,6 +16,8 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
   useEffect(() => {
     program.current = new Program();
   }, []);
+
+  // prints non-erroring messages
   useEffect(() => {
     if (!program.current?.stdout) return;
     const stdout = program.current?.stdout
@@ -24,6 +26,7 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
     stdout && setLines((p) => [...p, ...stdout]);
   }, [program.current?.stdout]);
 
+  // prints errors
   useEffect(() => {
     const stderr = program.current?.stderr
       .split("\n")
@@ -35,8 +38,12 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
     // @ts-ignore
     cursor.current?.scrollIntoView({ behavior: "instant", block: "nearest", inline: "nearest" });
   };
-  useEffect(() => {
+  const handleFocusOnCursor = () => {
     cursor.current?.focus();
+  };
+
+  useEffect(() => {
+    handleFocusOnCursor();
     scrollToBottom();
   }, [cursor, focus]);
 
@@ -44,7 +51,17 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
     setLines((p) => [...p, { type: type ?? "out", value: newOutput }]);
   };
 
+  const handleClearStdout = () => {
+    setLines([]);
+  };
+
   const handleSendCode = () => {
+    if (userInputBuffer === "clear") {
+      handleClearStdout();
+      setUserInputBuffer("");
+      return;
+    }
+
     handleSetStdout(userInputBuffer, "usr");
     const result = program.current?.input(userInputBuffer);
     result && handleSetStdout(result);
@@ -66,7 +83,7 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
   };
 
   return (
-    <div className="relative bg-stone-900 w-full h-full text-slate-300 sm:rounded-lg p-6 border border-zinc-200 text-sm font-mono">
+    <div className="relative bg-stone-900 w-full h-[80dvh] text-slate-300 sm:rounded-lg p-6 border border-zinc-200 text-sm font-mono">
       <div ref={terminal} className="h-full overflow-auto flex flex-col">
         {lines.map((s, i) => {
           const styles: { [key in LineType]: string } = {
@@ -88,6 +105,9 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
           value={userInputBuffer}
           placeholder=">_"
         />
+        <div onClick={() => handleFocusOnCursor()} className="flex flex-grow h-full">
+          {" "}
+        </div>
       </div>
     </div>
   );
