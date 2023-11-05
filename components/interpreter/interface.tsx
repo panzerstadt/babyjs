@@ -11,15 +11,16 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
   const program = useRef<Program>();
   const [userInputBuffer, setUserInputBuffer] = useState("");
   const [lines, setLines] = useState<{ type: LineType; value: string }[]>([
-    { type: "out", value: "Hello." },
+    { type: "out", value: "Hello there. type 'help' for a nice intro." },
   ]);
   useEffect(() => {
     program.current = new Program();
   }, []);
   useEffect(() => {
+    if (!program.current?.stdout) return;
     const stdout = program.current?.stdout
       .split("\n")
-      .map((s) => ({ type: "out" as LineType, value: s }));
+      .map((s) => ({ type: "out" as LineType, value: s || " " }));
     stdout && setLines((p) => [...p, ...stdout]);
   }, [program.current?.stdout]);
 
