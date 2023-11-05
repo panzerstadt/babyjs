@@ -1,3 +1,15 @@
+# BabyJS
+
+Site: [BabyJS](https://babyjs.vercel.app/)
+
+This is an ongoing project to build a programming language by following along with the amazing book [Crafting Interpreters](https://craftinginterpreters.com/).
+
+As I'm most comfortable in Typescript + React + Nextjs, and the focus is on mulling over the nuances of designing a programming language, This the programming language in question will be basically a rehash of Javascript, but only the parts that like and that don't give me too many footguns.
+
+BabyJS is also integrated into my [blog site](https://prng-v3.vercel.app/) with the hopes that I could find a way to turn it into my search interface in the near future.
+
+## NextJS setup
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
