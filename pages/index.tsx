@@ -9,7 +9,9 @@ export default function Home() {
     <main
       className={`flex min-h-screen flex-col items-center justify-center px-24 ${inter.className}`}
     >
-      <Interpreter />
+      <div className="h-[80dvh] w-full">
+        <Interpreter />
+      </div>
     </main>
   );
 }

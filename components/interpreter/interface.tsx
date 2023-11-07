@@ -8,6 +8,7 @@ const removeTimestamp = (str: string) => {
 
 interface InterpreterProps {
   focus?: number; // a random number to trigger a useEffect dep
+  onResult?: () => void; // pipe out
 }
 type LineType = "out" | "err" | "usr" | "usr-tmp";
 export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
@@ -33,6 +34,7 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
 
   // prints errors
   useEffect(() => {
+    if (!program.current?.stderr) return;
     const stderr = program.current?.stderr
       .split("\n")
       .map((s) => ({ type: "err" as LineType, value: removeTimestamp(s) }));
@@ -83,7 +85,6 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
     if (!lastGroupIdx) return currentLine;
 
     const multilines = lines.slice(lastGroupIdx);
-    console.log("multilines", multilines);
     return [...multilines.map((ml) => ml.value), currentLine].join("\n").trim();
   };
 
@@ -123,7 +124,7 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
   };
 
   return (
-    <div className="relative bg-stone-900 w-full h-[80dvh] text-slate-300 sm:rounded-lg p-6 border border-zinc-200 text-sm font-mono">
+    <div className="relative bg-stone-900 w-full h-full text-slate-300 sm:rounded-lg p-6 border border-zinc-200 text-sm font-mono">
       <div ref={terminal} className="h-full overflow-auto flex flex-col">
         {lines.map((s, i) => {
           const styles: { [key in LineType]: string } = {
@@ -142,7 +143,7 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
           ref={cursor}
           onChange={handleUserInput}
           onKeyDown={handleCaptureEnter}
-          className="bg-transparent text-sky-500 w-full outline-none pb-1 whitespace-pre"
+          className="bg-transparent text-sky-500 w-full outline-none pb-1"
           value={userInputBuffer}
           placeholder=">_"
         />
