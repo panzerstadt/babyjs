@@ -1,10 +1,15 @@
-import { MouseEventHandler, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Program } from "./program";
+import { given } from "flooent";
+
+const removeTimestamp = (str: string) => {
+  return given.string(str).after(":").trimStart().toString();
+};
 
 interface InterpreterProps {
   focus?: number; // a random number to trigger a useEffect dep
 }
-type LineType = "out" | "err" | "usr";
+type LineType = "out" | "err" | "usr" | "usr-tmp";
 export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
   const cursor = useRef<HTMLInputElement>(null);
   const terminal = useRef<HTMLDivElement>(null);
@@ -22,7 +27,7 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
     if (!program.current?.stdout) return;
     const stdout = program.current?.stdout
       .split("\n")
-      .map((s) => ({ type: "out" as LineType, value: s || " " }));
+      .map((s) => ({ type: "out" as LineType, value: removeTimestamp(s) || " " }));
     stdout && setLines((p) => [...p, ...stdout]);
   }, [program.current?.stdout]);
 
@@ -30,13 +35,13 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
   useEffect(() => {
     const stderr = program.current?.stderr
       .split("\n")
-      .map((s) => ({ type: "err" as LineType, value: s }));
+      .map((s) => ({ type: "err" as LineType, value: removeTimestamp(s) }));
     stderr && setLines((p) => [...p, ...stderr]);
   }, [program.current?.stderr]);
 
   const scrollToBottom = () => {
     // @ts-ignore
-    cursor.current?.scrollIntoView({ behavior: "instant", block: "nearest", inline: "nearest" });
+    cursor.current?.scrollIntoView({ behavior: "instant", block: "end", inline: "nearest" });
   };
   const handleFocusOnCursor = () => {
     cursor.current?.focus();
@@ -55,17 +60,48 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
     setLines([]);
   };
 
+  const handleUpdateUsrTmp = () => {
+    setLines((p) =>
+      p.map((l) => {
+        if (l.type !== "usr-tmp") return l;
+        return { type: "usr", value: l.value };
+      })
+    );
+  };
+
+  const handleMultiline = () => {
+    handleSetStdout(userInputBuffer, "usr-tmp");
+    setUserInputBuffer("");
+  };
+
+  const collectPrevMultilineUserInput = (currentLine: string) => {
+    let lastGroupIdx = undefined;
+    for (let ri = lines.length - 1; ri >= 0; ri--) {
+      if (lines[ri].type !== "usr-tmp") break;
+      lastGroupIdx = ri;
+    }
+    if (!lastGroupIdx) return currentLine;
+
+    const multilines = lines.slice(lastGroupIdx);
+    console.log("multilines", multilines);
+    return [...multilines.map((ml) => ml.value), currentLine].join("\n").trim();
+  };
+
   const handleSendCode = () => {
     if (userInputBuffer === "clear") {
       handleClearStdout();
       setUserInputBuffer("");
+      program.current?.clearStd();
       return;
     }
 
+    const multilineInput = collectPrevMultilineUserInput(userInputBuffer);
     handleSetStdout(userInputBuffer, "usr");
-    const result = program.current?.input(userInputBuffer);
+
+    const result = program.current?.input(multilineInput);
     result && handleSetStdout(result);
     setUserInputBuffer("");
+    handleUpdateUsrTmp();
     setTimeout(() => {
       scrollToBottom();
     }, 300);
@@ -73,7 +109,11 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
 
   const handleCaptureEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      handleSendCode();
+      if (e.shiftKey === true) {
+        handleMultiline();
+      } else {
+        handleSendCode();
+      }
     }
   };
 
@@ -90,6 +130,7 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
             out: "text-slate-300",
             err: "text-red-500",
             usr: "text-sky-600",
+            "usr-tmp": "text-sky-800",
           };
           return (
             <code key={i} className={`${styles[s.type]} whitespace-break-spaces`}>
@@ -101,10 +142,13 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
           ref={cursor}
           onChange={handleUserInput}
           onKeyDown={handleCaptureEnter}
-          className="bg-transparent text-sky-500 w-full outline-none pb-2"
+          className="bg-transparent text-sky-500 w-full outline-none pb-1 whitespace-pre"
           value={userInputBuffer}
           placeholder=">_"
         />
+        <span className="text-[10px] leading-[10px] italic font-bold text-gray-700 mt-0 select-none">
+          shift to multiline
+        </span>
         <div onClick={() => handleFocusOnCursor()} className="flex flex-grow h-full">
           {" "}
         </div>

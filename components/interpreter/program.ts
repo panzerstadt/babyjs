@@ -12,17 +12,20 @@ export class Program {
     this.interpreter.setLogger(this.output());
   }
 
+  private timestamp() {
+    return Date.now();
+  }
+
   output(): LoggerType {
     return {
       log: (...strs: string[]) => {
         this.stdout += strs
           .flat(5)
-          .map((s) => s + "\n")
+          .map((s) => `${this.timestamp()}: ${s}\n`)
           .join("");
       },
       error: (str: string) => {
-        console.log("erroring", str);
-        this.stderr += str + "\n";
+        this.stderr += `${this.timestamp()}: ${str}\n`;
       },
     };
   }
@@ -39,7 +42,7 @@ export class Program {
       return;
     }
     if (code === "help") {
-      this.stdout = this.help();
+      this.stdout = `${this.timestamp()}:${this.help()}`;
       return;
     }
 
