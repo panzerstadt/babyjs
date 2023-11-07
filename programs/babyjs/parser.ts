@@ -195,10 +195,10 @@ export class Parser {
 
   // these are STATIC errors: ERRORTYPE.STATIC
   error(token: Token, message: string) {
-    this.logger.error(`tokens errored: ${token.toString()} with '${message}'`);
+    // this.logger.error(`tokens errored: ${token.toString()} with '${message}'`);
     this._error.error(token, message); // 1. report to user
-    this._error.printErrors();
-    return new Parser.ParseError(); // 2. return exception (not throw. parser will decide whether or not to throw)
+    // this._error.printErrors();
+    // return new Parser.ParseError(); // 2. return exception (not throw. parser will decide whether or not to throw)
   }
 
   // error recovery,
@@ -310,6 +310,10 @@ export class Parser {
           // console.log("\nCONSOLE parse tree (json):\n", JSON.stringify(stmt, null, 4));
           this.logger.log("parse tree (json):\n", JSON.stringify(stmt, null, 2));
         });
+      }
+
+      if (this.hadError()) {
+        this._error.printErrors();
       }
 
       return statements;
