@@ -40,7 +40,7 @@ export class ScanError {
   }
 
   printErrors() {
-    this.logger.error("\nERRORS FOUND: when scanning the file.");
+    this.logger.error("ERRORS FOUND: when scanning the file.");
     this.logger.error("----------------START------------------");
     this.errors.forEach((e) => {
       this.logger.error(e);
@@ -104,7 +104,7 @@ export class ParseError {
   }
 
   printErrors() {
-    this.logger.error("\nERRORS FOUND: when parsing the file.");
+    this.logger.error("ERRORS FOUND: when parsing the file.");
     this.logger.error("----------------START------------------");
     this.errors.forEach((e) => {
       this.logger.error(e);
