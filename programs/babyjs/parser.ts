@@ -94,7 +94,7 @@ export class Parser {
     return this.equality();
   }
 
-  // equality -> comparison ( ( "!=" | "!==" ) comparison )*
+  // equality -> comparison ( ( "!=" | "==" ) comparison )*
   private equality(): AnyExpr {
     let expr = this.comparison();
 
@@ -184,7 +184,18 @@ export class Parser {
       return Expr.Grouping(expr);
     }
 
-    throw this.error(this.peek(), "Expect expression.");
+    /**
+     * when you miss a left hand operand, first expression falls here
+     * because your first token is a binary operator, and nothing
+     * starts with a binary operator
+     */
+    const offendingToken = this.peek();
+    this.error(offendingToken, `Expected an operand before '${offendingToken.lexeme}'`);
+
+    // @ts-ignore
+    return null;
+    // not throwing allows broken statements,
+    // but we also return hadError = true so we can collect and print all errors.
   }
 
   private consume(type: TokenType, expectsMessage: string): Token {
