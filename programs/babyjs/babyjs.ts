@@ -29,6 +29,9 @@ export class BabyJs {
     this.logger.log("-----------------");
   }
 
+  runOnce(code: string | null) {
+    this.run(code, false, true);
+  }
   /**
    * when the interpreter stores global variables.
    * Those variables should persist throughout the REPL session.
