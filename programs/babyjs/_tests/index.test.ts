@@ -3,8 +3,12 @@ import { BabyJs } from "../babyjs";
 describe("babyjs", () => {
   let babyjs: BabyJs;
   const logger = {
-    log: jest.fn(),
-    error: jest.fn(),
+    log: jest.fn((s: string) => {
+      console.log("log:", s);
+    }),
+    error: jest.fn((e: string) => {
+      console.log("err:", e);
+    }),
   };
 
   beforeEach(() => {
@@ -67,6 +71,41 @@ describe("babyjs", () => {
       babyjs.runOnce(code);
 
       expect(logger.log).toHaveBeenCalledWith(">>", 3);
+    });
+  });
+
+  describe("error handling", () => {
+    it("(==) missing left hand operand for binary operator", () => {
+      const code = "== 2;";
+      babyjs.runOnce(code);
+
+      expect(logger.log).not.toHaveBeenCalled();
+      expect(logger.error).toHaveBeenNthCalledWith(
+        3,
+        expect.stringContaining("Expected an operand before '=='")
+      );
+    });
+    it("(!=) missing left hand operand for binary operator", () => {
+      const code = "!= 2;";
+      babyjs.runOnce(code);
+
+      expect(logger.error).toHaveBeenNthCalledWith(
+        3,
+        expect.stringContaining("Expected an operand before '!='")
+      );
+    });
+    it("(multiple) missing left hand operand for binary operator", () => {
+      const code = "<= 2;==1;";
+      babyjs.runOnce(code);
+
+      expect(logger.error).toHaveBeenNthCalledWith(
+        3,
+        expect.stringContaining("Expected an operand before '<='")
+      );
+      expect(logger.error).toHaveBeenNthCalledWith(
+        4,
+        expect.stringContaining("Expected an operand before '=='")
+      );
     });
   });
 });
