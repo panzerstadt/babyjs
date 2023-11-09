@@ -29,8 +29,8 @@ export class BabyJs {
     this.logger.log("-----------------");
   }
 
-  runOnce(code: string | null) {
-    this.run(code, false, true);
+  runOnce(code: string | null, debug: boolean = false) {
+    this.run(code, debug, true);
   }
   /**
    * when the interpreter stores global variables.
