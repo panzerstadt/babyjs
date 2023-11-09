@@ -86,6 +86,9 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
 
   const handleMultiline = () => {
     handleSetStdout(userInputBuffer, "usr-tmp");
+    // record history
+    add(userInputBuffer);
+
     setUserInputBuffer("");
   };
 
@@ -113,7 +116,7 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
     handleSetStdout(userInputBuffer, "usr");
 
     // record history
-    add(multilineInput);
+    add(userInputBuffer);
 
     // interpret
     const result = program.current?.input(multilineInput);
