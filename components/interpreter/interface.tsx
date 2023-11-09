@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Program } from "./program";
 import { given } from "flooent";
+import { useHistory } from "./useHistory";
 
 const removeTimestamp = (str: string) => {
   return given.string(str).after(":").trimStart().toString();
@@ -15,13 +16,25 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
   const cursor = useRef<HTMLInputElement>(null);
   const terminal = useRef<HTMLDivElement>(null);
   const program = useRef<Program>();
+
   const [userInputBuffer, setUserInputBuffer] = useState("");
   const [lines, setLines] = useState<{ type: LineType; value: string }[]>([
     { type: "out", value: "Hello there. type 'help' for a nice intro." },
   ]);
+
   useEffect(() => {
     program.current = new Program();
   }, []);
+
+  const [userHistory, { back, forward, add }] = useHistory();
+  useEffect(() => {
+    if (!!userHistory) {
+      setUserInputBuffer(userHistory);
+      return;
+    }
+
+    setUserInputBuffer("");
+  }, [userHistory]);
 
   // prints non-erroring messages
   useEffect(() => {
@@ -99,6 +112,10 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
     const multilineInput = collectPrevMultilineUserInput(userInputBuffer);
     handleSetStdout(userInputBuffer, "usr");
 
+    // record history
+    add(multilineInput);
+
+    // interpret
     const result = program.current?.input(multilineInput);
     result && handleSetStdout(result);
     setUserInputBuffer("");
@@ -108,13 +125,22 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
     }, 300);
   };
 
-  const handleCaptureEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeydown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       if (e.shiftKey === true) {
         handleMultiline();
       } else {
         handleSendCode();
       }
+    }
+
+    if (e.key === "ArrowUp") {
+      back();
+      e.preventDefault();
+    }
+    if (e.key === "ArrowDown") {
+      forward();
+      e.preventDefault();
     }
   };
 
@@ -142,7 +168,7 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
         <input
           ref={cursor}
           onChange={handleUserInput}
-          onKeyDown={handleCaptureEnter}
+          onKeyDown={handleKeydown}
           className="bg-transparent text-sky-500 w-full outline-none pb-1"
           value={userInputBuffer}
           placeholder=">_"
