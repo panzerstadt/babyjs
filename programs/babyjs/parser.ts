@@ -4,6 +4,9 @@ import { AnyStmt, Stmt } from "./primitives/statements";
 import { Token } from "./token";
 import { LoggerType, TokenType } from "./types";
 
+// TODO: fun extra challenge: support IF x THEN y ELSE z
+// which is different from js ternaries (also included) as well as python ternaries (expr1 if condition else expr2)
+
 /*
 Scanner = reads characters left to right
 Parser = reads Tokens left to right
