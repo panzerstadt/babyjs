@@ -1,5 +1,31 @@
 import { Token } from "../token";
 
+interface Ternary {
+  readonly type: "ternary";
+  readonly left: AnyExpr;
+  readonly leftOp: Token;
+  readonly center: AnyExpr;
+  readonly rightOp: Token;
+  readonly right: AnyExpr;
+}
+
+const ternary = (
+  left: AnyExpr,
+  leftOp: Token,
+  center: AnyExpr,
+  rightOp: Token,
+  right: AnyExpr
+): Ternary => {
+  return {
+    type: "ternary",
+    left,
+    leftOp,
+    center,
+    rightOp,
+    right,
+  };
+};
+
 interface Binary {
   readonly type: "binary";
   readonly left: AnyExpr;
@@ -57,8 +83,9 @@ const variable = (name: Token): Variable => {
   return { type: "variable", name };
 };
 
-export type AnyExpr = Binary | Grouping | Literal | Unary | Variable;
+export type AnyExpr = Ternary | Binary | Grouping | Literal | Unary | Variable;
 export interface Expr {
+  Ternary: Ternary;
   Binary: Binary;
   Grouping: Grouping;
   Literal: Literal;
@@ -66,6 +93,7 @@ export interface Expr {
   Variable: Variable;
 }
 export const Expr = {
+  Ternary: ternary,
   Binary: binary,
   Grouping: grouping,
   Literal: literal,

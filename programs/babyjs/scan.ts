@@ -92,6 +92,9 @@ export class Scanner {
       case ";":
         this.addToken(TokenType.SEMICOLON); // signifies end of statement (comments don't need it of course)
         break;
+      case ":":
+        this.addToken(TokenType.COLON);
+        break;
       case "*":
         this.addToken(TokenType.STAR);
         break;
@@ -100,6 +103,9 @@ export class Scanner {
         break;
       case "!":
         this.addToken(this.match("=") ? TokenType.BANG_EQUAL : TokenType.BANG);
+        break;
+      case "?":
+        this.addToken(this.match("?") ? TokenType.QUESTION_QUESTION : TokenType.QUESTION);
         break;
       case ">":
         this.addToken(this.match("=") ? TokenType.GREATER_EQUAL : TokenType.GREATER);

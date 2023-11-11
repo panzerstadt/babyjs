@@ -5,6 +5,7 @@ export enum TokenType {
   COMMA = "COMMA",
   DOT = "DOT",
 
+  COLON = "COLON", // ternary (for now)
   SEMICOLON = "SEMICOLON", // EOL
   SLASH = "SLASH", // slash is special in zephyr's dts: https://docs.zephyrproject.org/latest/build/dts/intro-syntax-structure.html
 
@@ -36,6 +37,7 @@ export enum TokenType {
   BANG_EQUAL = "BANG_EQUAL",
   EQUAL_EQUAL = "EQUAL_EQUAL",
   BANG = "BANG",
+  QUESTION = "QUESTION",
   GREATER_EQUAL = "GREATER_EQUAL",
   LESS_EQUAL = "LESS_EQUAL",
   FALSE = "FALSE",

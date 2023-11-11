@@ -9,7 +9,8 @@ Scanner = reads characters left to right
 Parser = reads Tokens left to right
 ------
 Expression Grammar for this parser in Backus-Naur Form (BNF) (subset of statement grammar)
-expression     → equality ;
+expression     → ternary ;
+ternary        → equality ( "?" expression ":" ternary )* ;
 equality       → comparison ( ( "!=" | "==" ) comparison )* ;
 comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
 term           → factor ( ( "-" | "+" ) factor )* ;
@@ -91,7 +92,33 @@ export class Parser {
 
   // expression -> equality
   private expression(): AnyExpr {
-    return this.equality();
+    return this.ternary();
+  }
+
+  private ternary(chains = 0): AnyExpr {
+    let expr = this.equality();
+
+    let count = chains;
+    if (this.match(TokenType.QUESTION)) {
+      count++;
+      if (count === 1) {
+        this.logger.info?.(
+          `if looks like you're chaining ternary operators, and that might make your code harder to read. maybe try separating your comparison code into individual lines, or explicitly add parentheses to denote ordering?`
+        );
+      }
+
+      const leftOp = this.previous();
+      const center = this.expression();
+
+      this.consume(TokenType.COLON, "Expect ':' after middle ternary expression.");
+      const rightOp = this.previous(); // consume, then rewind to grab token
+
+      const right = this.ternary(1);
+
+      expr = Expr.Ternary(expr, leftOp, center, rightOp, right);
+    }
+
+    return expr;
   }
 
   // equality -> comparison ( ( "!=" | "==" ) comparison )*

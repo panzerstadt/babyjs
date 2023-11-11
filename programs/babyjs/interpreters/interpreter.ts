@@ -44,6 +44,8 @@ export class Interpreter {
   // like printAST's process() method, is recursive
   private evaluate(expr: AnyExpr): Object {
     switch (expr.type) {
+      case "ternary":
+        return this.visitTernaryExpr(expr);
       case "binary":
         return this.visitBinaryExpr(expr);
       case "grouping":
@@ -171,6 +173,20 @@ export class Interpreter {
         this.checkNumberOperands(expr.operator, left, right);
         // @ts-ignore
         return (left * right) as number;
+    }
+
+    // unreachable
+    // @ts-expect-error
+    return null;
+  }
+
+  public visitTernaryExpr(expr: Expr["Ternary"]): Object {
+    const left = this.evaluate(expr.left);
+    const center = this.evaluate(expr.center);
+    const right = this.evaluate(expr.right);
+
+    if (expr.leftOp.type === TokenType.QUESTION && expr.rightOp.type === TokenType.COLON) {
+      return this.isTruthy(left) ? center : right;
     }
 
     // unreachable
