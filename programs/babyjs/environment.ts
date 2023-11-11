@@ -34,6 +34,20 @@ e.g: let my_variable = "one"; ---> my_variable = "two";
     this.values.set(name, value);
   }
 
+  assign(name: Token, value: Object) {
+    const prevValue = this.values.get(name.lexeme);
+    if (!!prevValue) {
+      if (this.strict) {
+        // TODO: check if mut (also introduce explicit mut, like rust)
+        this.logger.info?.(`reassigning value "${name.lexeme}" to "${value}"`);
+      }
+      this.values.set(name.lexeme, value);
+      return;
+    }
+
+    throw new RuntimeError(name, `Undefined variable '${name.lexeme}`);
+  }
+
   get(name: Token): Object {
     if (this.values.has(name.lexeme)) {
       return this.values.get(name.lexeme)!;

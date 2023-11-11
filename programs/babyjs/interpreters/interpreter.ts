@@ -57,6 +57,8 @@ export class Interpreter {
         return this.visitUnaryExpr(expr);
       case "variable":
         return this.visitVariableExpr(expr);
+      case "assign":
+        return this.visitAssignExpr(expr);
     }
 
     // unreachable
@@ -198,6 +200,12 @@ export class Interpreter {
 
   public visitVariableExpr(expr: Expr["Variable"]): Object {
     return this.environment.get(expr.name);
+  }
+
+  public visitAssignExpr(expr: Expr["Assign"]): Object {
+    const value = this.evaluate(expr.value);
+    this.environment.assign(expr.name, value);
+    return value;
   }
 
   /**

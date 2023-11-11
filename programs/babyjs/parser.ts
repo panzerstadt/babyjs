@@ -12,7 +12,9 @@ Scanner = reads characters left to right
 Parser = reads Tokens left to right
 ------
 Expression Grammar for this parser in Backus-Naur Form (BNF) (subset of statement grammar)
-expression     → ternary ;
+expression     → assignment ;
+assignment     → IDENTIFIER "=" assignment
+               | ternary ;
 ternary        → equality ( "?" expression ":" ternary )* ;
 equality       → comparison ( ( "!=" | "==" ) comparison )* ;
 comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
@@ -96,9 +98,30 @@ export class Parser {
     return this.tokens[this.current - 1];
   }
 
-  // expression -> equality
+  // expression -> assignment
   private expression(): AnyExpr {
-    return this.ternary();
+    return this.assignment();
+  }
+
+  // assignment -> IDENTIFIER "=" assignemt | ternary
+  private assignment(): AnyExpr {
+    let expr = this.ternary();
+
+    // its possible to have more than a single token lookahead
+    // e.g. makeList().head.next = node;
+    if (this.match(TokenType.EQUAL)) {
+      const equals = this.previous();
+      const value = this.assignment();
+
+      if (expr.type === "variable") {
+        const name = expr.name;
+        return Expr.Assign(name, value);
+      }
+
+      this.error(equals, `Invalid assignment target.`);
+    }
+
+    return expr;
   }
 
   private ternary(chains = 0): AnyExpr {

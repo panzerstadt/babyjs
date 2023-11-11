@@ -90,6 +90,16 @@ describe("babyjs", () => {
     });
   });
 
+  describe("variable assignment", () => {
+    it.only("works", () => {
+      const code = `let a = 10; a = 20; print a;`;
+      babyjs.runOnce(code, true);
+
+      expect(logger.error).not.toHaveBeenCalled();
+      expect(logger.log).toHaveBeenCalledWith(">>", 20);
+    });
+  });
+
   describe("error handling", () => {
     it("(==) missing left hand operand for binary operator", () => {
       const code = "== 2;";

@@ -74,6 +74,19 @@ const unary = (operator: Token, right: AnyExpr): Unary => {
   return { type: "unary", operator, right };
 };
 
+interface Assign {
+  readonly type: "assign";
+  readonly name: Token;
+  readonly value: AnyExpr;
+}
+
+/**
+ * assign is like a unary, one op plus one value
+ */
+const assign = (name: Token, value: AnyExpr): Assign => {
+  return { type: "assign", name, value };
+};
+
 interface Variable {
   readonly type: "variable";
   readonly name: Token;
@@ -83,7 +96,7 @@ const variable = (name: Token): Variable => {
   return { type: "variable", name };
 };
 
-export type AnyExpr = Ternary | Binary | Grouping | Literal | Unary | Variable;
+export type AnyExpr = Ternary | Binary | Grouping | Literal | Unary | Variable | Assign;
 export interface Expr {
   Ternary: Ternary;
   Binary: Binary;
@@ -91,6 +104,7 @@ export interface Expr {
   Literal: Literal;
   Unary: Unary;
   Variable: Variable;
+  Assign: Assign;
 }
 export const Expr = {
   Ternary: ternary,
@@ -99,4 +113,5 @@ export const Expr = {
   Literal: literal,
   Unary: unary,
   Variable: variable,
+  Assign: assign,
 };
