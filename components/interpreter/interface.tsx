@@ -4,7 +4,7 @@ import { given } from "flooent";
 import { useHistory } from "./useHistory";
 
 const removeTimestamp = (str: string) => {
-  return given.string(str).after(":").trimStart().toString();
+  return given.string(str).after(":").toString();
 };
 
 interface InterpreterProps {

@@ -21,11 +21,12 @@ export class Program {
       log: (...strs: string[]) => {
         this.stdout += strs
           .flat(5)
-          .map((s) => `${this.timestamp()}: ${s}\n`)
+          .map((s) => `${this.timestamp()}:${s}\n`)
           .join("");
       },
       error: (str: string) => {
-        this.stderr += `${this.timestamp()}: ${str}\n`;
+        const strs = str.split("\n");
+        this.stderr += strs.map((s) => `${this.timestamp()}:${s}\n`).join("");
       },
     };
   }

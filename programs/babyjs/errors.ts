@@ -29,11 +29,12 @@ export class ScanError {
 
     const multiline = rawLine.split("\n");
 
+    // note that the empty row has a whitespace in order to maintain the empty row
     const fullErrorMessage = `
-    [line ${line}] Error ${where}: ${message}
-  
-      ${line} | ${multiline[line - 1]}
-      ${pointToErrorAt(col, line, multiline)}
+[line ${line}] Error ${where}: ${message}
+ 
+${line} | ${multiline[line - 1]}
+${pointToErrorAt(col, line, multiline)}
     `;
     this.errors.push(fullErrorMessage);
     return { error: true };
