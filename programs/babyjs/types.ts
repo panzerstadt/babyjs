@@ -46,6 +46,7 @@ export enum TokenType {
   CLASS = "CLASS",
   FUNC = "FUNC",
   LET = "LET", // because i'm offended by var
+  QUESTION_QUESTION = "QUESTION_QUESTION", // ??, similar to ts
 
   FOR = "FOR",
   IF = "IF",
