@@ -1,17 +1,23 @@
 import { RuntimeError } from "./errors";
 import { Token } from "./token";
+import { LoggerType } from "./types";
 
 export class Environment {
+  logger: Console | LoggerType = console;
   private readonly values: Map<string, Object | null> = new Map();
+
+  setLogger(newLogger: LoggerType) {
+    this.logger = newLogger;
+  }
 
   define(name: string, value: Object | null) {
     const prevValue = this.values.get(name);
     if (!!prevValue) {
-      console.log(
+      this.logger.info?.(
         `
-hey you've already set variable ${name} before to "${prevValue}". 
+hey you've already set variable "${name}" before to "${prevValue}". 
 I will be redefining it as "${value}", just so you know.
-to keep yourself sane, maybe next time reassign it instead (without using the 'let' keyword), 
+to keep yourself sane, maybe next time reassign it instead (without using the "let" keyword), 
 e.g: let my_variable = "one"; ---> my_variable = "two";
         `
       );

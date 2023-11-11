@@ -12,6 +12,7 @@ export class Interpreter {
 
   setLogger(newLogger: LoggerType) {
     this.logger = newLogger;
+    this.environment.setLogger(newLogger);
   }
 
   public interpret(statements: AnyStmt[], debug?: boolean): RuntimeError | undefined {
