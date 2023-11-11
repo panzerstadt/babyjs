@@ -60,6 +60,9 @@ export class Parser {
     return this._error.hadError;
   }
 
+  /**
+   * match consumes the token, moving the current token one forward
+   */
   private match(...types: TokenType[]) {
     for (const type of types) {
       if (this.check(type)) {
