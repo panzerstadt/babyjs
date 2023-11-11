@@ -55,6 +55,18 @@ describe("babyjs", () => {
 
       expect(logger.log).toHaveBeenCalledWith(">>", 3.142857142857143);
     });
+    it("performs comparisons", () => {
+      const code = `print 1 == 1;`;
+      babyjs.runOnce(code);
+
+      expect(logger.log).toHaveBeenCalledWith(">>", true);
+    });
+    it("does not typecast in comparisons (similar to js strict equality 'a === b'", () => {
+      const code = `print 1 == "1";`;
+      babyjs.runOnce(code);
+
+      expect(logger.log).toHaveBeenCalledWith(">>", false);
+    });
   });
 
   describe("let", () => {
