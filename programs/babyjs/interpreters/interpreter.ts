@@ -197,9 +197,7 @@ export class Interpreter {
   }
 
   public visitVariableExpr(expr: Expr["Variable"]): Object {
-    const rs = this.environment.get(expr.name);
-    console.log("variable results", rs, `${rs}`);
-    return rs;
+    return this.environment.get(expr.name);
   }
 
   /**
