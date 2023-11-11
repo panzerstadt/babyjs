@@ -1,7 +1,7 @@
 import { ParseError } from "./errors";
 import { AnyExpr, Expr } from "./primitives/expressions";
 import { AnyStmt, Stmt } from "./primitives/statements";
-import { Token } from "./token";
+import { NULL_LITERAL, Token } from "./token";
 import { LoggerType, TokenType } from "./types";
 
 // TODO: fun extra challenge: support IF x THEN y ELSE z
@@ -204,7 +204,7 @@ export class Parser {
   private primary(): AnyExpr {
     if (this.match(TokenType.FALSE)) return Expr.Literal(false);
     if (this.match(TokenType.TRUE)) return Expr.Literal(true);
-    if (this.match(TokenType.NIL)) return Expr.Literal("null");
+    if (this.match(TokenType.NIL)) return Expr.Literal(NULL_LITERAL);
 
     if (this.match(TokenType.NUMBER, TokenType.STRING)) {
       // cause match advances, after we match it we take the previous token

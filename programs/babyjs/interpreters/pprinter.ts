@@ -1,4 +1,5 @@
 import { AnyExpr } from "../primitives/expressions";
+import { NULL_LITERAL } from "../token";
 
 /**
  * This is also an interpreter,
@@ -118,7 +119,7 @@ export const printAST = (expr: AnyExpr, style = PrintStyle.parenthesis, padLeft 
       //   if (expr.value == null) return "nil";
       //   return expr.value.toString();
       // }
-      return expr.value === null ? "nil" : expr.value.toString();
+      return expr.value === null ? NULL_LITERAL : expr.value.toString();
     case "unary":
       // public String visitUnaryExpr(Expr.Unary expr) {
       //   return parenthesize(expr.operator.lexeme, expr.right);

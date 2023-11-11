@@ -2,7 +2,7 @@ import { Environment } from "../environment";
 import { RuntimeError } from "../errors";
 import { AnyExpr, Expr } from "../primitives/expressions";
 import { AnyStmt, Stmt } from "../primitives/statements";
-import { Token } from "../token";
+import { NULL_LITERAL, Token } from "../token";
 import { LoggerType, TokenType } from "../types";
 import { PrintStyle, printAST } from "./pprinter";
 
@@ -67,7 +67,7 @@ export class Interpreter {
 
   // https://chat.openai.com/share/ba09a5f7-a8a4-4401-aa24-898c91c89d40
   private isTruthy(object: Object): boolean {
-    if (object === "null") return false;
+    if (object === NULL_LITERAL) return false;
     if (object === null) return false;
     if (object === undefined) return false;
     if (typeof object === "boolean") return Boolean(object);
@@ -197,7 +197,9 @@ export class Interpreter {
   }
 
   public visitVariableExpr(expr: Expr["Variable"]): Object {
-    return this.environment.get(expr.name);
+    const rs = this.environment.get(expr.name);
+    console.log("variable results", rs, `${rs}`);
+    return rs;
   }
 
   /**
@@ -221,7 +223,7 @@ export class Interpreter {
   public visitLetStmt(stmt: Stmt["Let"], debug?: boolean): void {
     debug && this.debugStatement(stmt);
 
-    let value = null;
+    let value = NULL_LITERAL as Object;
     if (stmt.initializer !== null) {
       value = this.evaluate(stmt.initializer);
     }

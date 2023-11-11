@@ -48,4 +48,6 @@ export const accidentalKeywords = {
   null: "Did you mean 'nil'? This isn't Javascript you know...",
 } as const;
 
+export const NULL_LITERAL = "nil";
+
 export type Keywords = Partial<keyof typeof keywords | keyof typeof accidentalKeywords>;
