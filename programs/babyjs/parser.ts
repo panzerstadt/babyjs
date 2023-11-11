@@ -100,7 +100,7 @@ export class Parser {
 
     let count = 0;
     while (this.match(TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL)) {
-      const operator = this.previous();
+      const operator = this.previous(); // previous token, meaning != or ==
       const right = this.comparison();
       expr = Expr.Binary(expr, operator, right);
       count++;
@@ -108,7 +108,7 @@ export class Parser {
 
     if (count > 1) {
       this.logger.info?.(
-        `you're chaining comparison operators, and that might make your code harder to read. maybe try separating your comparison code into individual lines, or explicitly adding parenthesis to denote ordering?`
+        `it looks like you're chaining comparison operators, and that might make your code harder to read. maybe try separating your comparison code into individual lines, or explicitly add parentheses to denote ordering?`
       );
     }
 
