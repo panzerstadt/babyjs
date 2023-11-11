@@ -1,31 +1,31 @@
 import { useEffect, useRef, useState } from "react";
 import { Program } from "./program";
-import { given } from "flooent";
 import { useHistory } from "./useHistory";
 import { Tips } from "./tips";
-
-const removeTimestamp = (str: string) => {
-  return given.string(str).after(":").toString();
-};
+import { useStd } from "./useStd";
 
 interface InterpreterProps {
   focus?: number; // a random number to trigger a useEffect dep
   onResult?: () => void; // pipe out
 }
-type LineType = "out" | "err" | "usr" | "usr-tmp";
+export type Line = { type: LineType; value: string };
+type LineType = "out" | "err" | "info" | "usr" | "usr-tmp";
 export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
   const cursor = useRef<HTMLInputElement>(null);
   const terminal = useRef<HTMLDivElement>(null);
   const program = useRef<Program>();
 
   const [userInputBuffer, setUserInputBuffer] = useState("");
-  const [lines, setLines] = useState<{ type: LineType; value: string }[]>([
+  const [lines, setLines] = useState<Line[]>([
     { type: "out", value: "Hello there. type 'help' for a nice intro." },
   ]);
 
   useEffect(() => {
     program.current = new Program();
   }, []);
+  useStd(program, "out", setLines);
+  useStd(program, "err", setLines);
+  useStd(program, "info", setLines);
 
   const [userHistory, { back, forward, add }] = useHistory();
   useEffect(() => {
@@ -36,24 +36,6 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
 
     setUserInputBuffer("");
   }, [userHistory]);
-
-  // prints non-erroring messages
-  useEffect(() => {
-    if (!program.current?.stdout) return;
-    const stdout = program.current?.stdout
-      .split("\n")
-      .map((s) => ({ type: "out" as LineType, value: removeTimestamp(s) || " " }));
-    stdout && setLines((p) => [...p, ...stdout]);
-  }, [program.current?.stdout]);
-
-  // prints errors
-  useEffect(() => {
-    if (!program.current?.stderr) return;
-    const stderr = program.current?.stderr
-      .split("\n")
-      .map((s) => ({ type: "err" as LineType, value: removeTimestamp(s) }));
-    stderr && setLines((p) => [...p, ...stderr]);
-  }, [program.current?.stderr]);
 
   const scrollToBottom = () => {
     // @ts-ignore
@@ -162,6 +144,7 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
             err: "text-red-500",
             usr: "text-sky-600",
             "usr-tmp": "text-sky-800",
+            info: "text-orange-500 text-[11px] leading-[13px]",
           };
           return (
             <code key={i} className={`${styles[s.type]} whitespace-break-spaces`}>

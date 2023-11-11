@@ -6,6 +6,7 @@ export class Program {
   interpreter: BabyJs;
   stdout = "";
   stderr = "";
+  stdinfo = "";
 
   constructor() {
     this.interpreter = new BabyJs();
@@ -28,12 +29,19 @@ export class Program {
         const strs = str.split("\n");
         this.stderr += strs.map((s) => `${this.timestamp()}:${s}\n`).join("");
       },
+      info: (...strs: string[]) => {
+        this.stdinfo += strs
+          .flat(5)
+          .map((s) => `${this.timestamp()}:${s}\n`)
+          .join("");
+      },
     };
   }
 
   clearStd() {
     this.stdout = "";
     this.stderr = "";
+    this.stdinfo = "";
   }
 
   input(code: string) {
