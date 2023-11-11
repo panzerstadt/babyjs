@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Program } from "./program";
 import { given } from "flooent";
 import { useHistory } from "./useHistory";
+import { Tips } from "./tips";
 
 const removeTimestamp = (str: string) => {
   return given.string(str).after(":").toString();
@@ -176,9 +177,10 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
           value={userInputBuffer}
           placeholder=">_"
         />
-        <span className="text-[10px] leading-[10px] italic font-bold text-gray-700 mt-0 select-none">
-          shift to multiline
-        </span>
+        <div className="text-[10px] leading-[10px] italic font-bold text-gray-700 mt-0 select-none group">
+          <span>shift to multiline</span>
+          <Tips />
+        </div>
         <div onClick={() => handleFocusOnCursor()} className="flex flex-grow h-full">
           {" "}
         </div>
