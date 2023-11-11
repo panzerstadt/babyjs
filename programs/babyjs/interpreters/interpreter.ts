@@ -21,7 +21,7 @@ export class Interpreter {
         this.execute(statement, debug);
       }
     } catch (runtimeError) {
-      this.logger.log("runtime error", runtimeError);
+      // this.logger.log("runtime error", runtimeError);
       return runtimeError as RuntimeError;
       // lox.runtimeError(error);
     }
@@ -226,7 +226,7 @@ export class Interpreter {
       value = this.evaluate(stmt.initializer);
     }
 
-    this.environment.define(stmt.name.lexeme, value);
+    this.environment.define(stmt.name.lexeme, value, stmt.name);
   }
 
   debugStatement(stmt: AnyStmt) {
