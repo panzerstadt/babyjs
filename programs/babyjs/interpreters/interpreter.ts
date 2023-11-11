@@ -66,6 +66,7 @@ export class Interpreter {
 
   // https://chat.openai.com/share/ba09a5f7-a8a4-4401-aa24-898c91c89d40
   private isTruthy(object: Object): boolean {
+    if (object === "null") return false;
     if (object === null) return false;
     if (object === undefined) return false;
     if (typeof object === "boolean") return Boolean(object);
