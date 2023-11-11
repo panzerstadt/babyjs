@@ -62,5 +62,7 @@ export enum TokenType {
 
 export interface LoggerType {
   log: Function;
+  warn?: Function;
+  info?: Function;
   error: Function;
 }

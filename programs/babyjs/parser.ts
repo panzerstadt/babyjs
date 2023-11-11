@@ -98,10 +98,18 @@ export class Parser {
   private equality(): AnyExpr {
     let expr = this.comparison();
 
+    let count = 0;
     while (this.match(TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL)) {
       const operator = this.previous();
       const right = this.comparison();
       expr = Expr.Binary(expr, operator, right);
+      count++;
+    }
+
+    if (count > 1) {
+      this.logger.info?.(
+        `you're chaining comparison operators, and that might make your code harder to read. maybe try separating your comparison code into individual lines, or explicitly adding parenthesis to denote ordering?`
+      );
     }
 
     return expr;
