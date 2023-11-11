@@ -144,7 +144,7 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
             err: "text-red-500",
             usr: "text-sky-600",
             "usr-tmp": "text-sky-800",
-            info: "text-orange-500 text-[11px] leading-[13px]",
+            info: "text-orange-600 text-[11px] leading-[13px]",
           };
           return (
             <code key={i} className={`${styles[s.type]} whitespace-break-spaces`}>
