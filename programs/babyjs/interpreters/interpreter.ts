@@ -254,6 +254,8 @@ export class Interpreter {
   }
 
   public visitBlockStmt(stmt: Stmt["Block"], debug?: boolean): void {
+    debug && this._debugStatement(stmt);
+
     this.executeBlock(stmt.statements, new Environment(this.environment, debug));
   }
 
@@ -267,7 +269,7 @@ export class Interpreter {
     this.logger.log("- - - - -");
     this.logger.log("ast      :\n", printAST(expr, PrintStyle.ast));
     this.logger.log("- - - - -");
-    this.logger.log("ast(json):\n", JSON.stringify(printAST(expr, PrintStyle.json), null, 3));
+    this.logger.log("ast(json):\n", ...JSON.stringify(printAST(expr, PrintStyle.json), null, 3).split("\n")); // prettier-ignore
     this.logger.log(" ");
   }
 }

@@ -114,7 +114,7 @@ export const printAST = (expr: AnyExpr | AnyStmt, style = PrintStyle.parenthesis
     case "let":
       return process(expr.type, { type: "variable", name: expr.name });
     case "assign":
-      return process(expr.type, expr.value);
+      return process(`${expr.type} ${expr.name.lexeme}`, expr.value);
     case "ternary":
       return process(expr.type, expr.left, expr.center, expr.right);
     case "binary":

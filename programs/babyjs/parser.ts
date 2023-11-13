@@ -397,7 +397,7 @@ export class Parser {
       if (debug) {
         statements.forEach((stmt) => {
           // console.log("\nCONSOLE parse tree (json):\n", JSON.stringify(stmt, null, 4));
-          this.logger.log("parse tree (json):\n", JSON.stringify(stmt, null, 2));
+          this.logger.log("parse tree (json):\n", ...JSON.stringify(stmt, null, 4).split("\n"));
         });
       }
 
