@@ -1,5 +1,5 @@
 import { RuntimeError } from "./errors";
-import { Token } from "./token";
+import { NULL_LITERAL, Token } from "./token";
 import { LoggerType } from "./types";
 
 export class Environment {
@@ -83,7 +83,11 @@ e.g: let my_variable = "one"; ---> my_variable = "two";
   get(name: Token): Object {
     if (this.values.has(name.lexeme)) {
       this.debug && this.printEnvironment(this.get.name);
-      return this.values.get(name.lexeme)!;
+      const value = this.values.get(name.lexeme)!;
+      if (!value || value === NULL_LITERAL) {
+        throw new RuntimeError(name, `Unassigned variable '${name.lexeme}'`);
+      }
+      return value;
     }
 
     if (this.enclosing !== null) return this.enclosing.get(name);
