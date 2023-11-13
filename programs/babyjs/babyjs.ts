@@ -19,7 +19,7 @@ export class BabyJs {
   }
 
   runtimeError(error: RuntimeError) {
-    this.logger.error(`[line ${error.token.line}] token '${error.token.lexeme}': ${error.message}`);
+    this.logger.error(`[line ${error.token?.line}] token '${error.token?.lexeme}': ${error.message}`); // prettier-ignore
     this.hadRuntimeError = true;
   }
 
@@ -62,6 +62,7 @@ export class BabyJs {
     debug && this.pprintStep("Interpreting");
     const error = this.interpreter.interpret(statements, debug);
     if (error) {
+      console.error(error);
       this.runtimeError(error);
     }
 

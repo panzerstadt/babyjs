@@ -1,4 +1,5 @@
 import { AnyExpr } from "../primitives/expressions";
+import { AnyStmt } from "../primitives/statements";
 import { NULL_LITERAL } from "../token";
 
 /**
@@ -22,8 +23,8 @@ export enum PrintStyle {
 // parsers do the reverse of pprint
 // they take a string and turn it into rules
 // they 'figure out which rules could have generated that string'
-export const printAST = (expr: AnyExpr, style = PrintStyle.parenthesis, padLeft = 0) => {
-  const parenthesize = (name: string, ...exprs: AnyExpr[]): string => {
+export const printAST = (expr: AnyExpr | AnyStmt, style = PrintStyle.parenthesis, padLeft = 0) => {
+  const parenthesize = (name: string, ...exprs: (AnyExpr | AnyStmt)[]): string => {
     const result = [];
 
     result.push("(");
@@ -37,7 +38,7 @@ export const printAST = (expr: AnyExpr, style = PrintStyle.parenthesis, padLeft 
     return result.join("");
   };
 
-  const rpnize = (name: string, ...exprs: AnyExpr[]): string => {
+  const rpnize = (name: string, ...exprs: (AnyExpr | AnyStmt)[]): string => {
     const result = [];
 
     // run through expressions and process the literals
@@ -59,7 +60,7 @@ export const printAST = (expr: AnyExpr, style = PrintStyle.parenthesis, padLeft 
   };
 
   const space = (num: number) => new Array(Math.round(num)).fill(" ").join("");
-  const simplifiedAST = (name: string, ...exprs: AnyExpr[]): string => {
+  const simplifiedAST = (name: string, ...exprs: (AnyExpr | AnyStmt)[]): string => {
     let ast = [];
 
     ast.push(`${space(padLeft)}${name}`);
@@ -77,7 +78,7 @@ export const printAST = (expr: AnyExpr, style = PrintStyle.parenthesis, padLeft 
   /**
    * this can actually be fed into a react flow visualizer
    */
-  const simplifiedJSON = (name: string, ...exprs: AnyExpr[]): Object => {
+  const simplifiedJSON = (name: string, ...exprs: (AnyExpr | AnyStmt)[]): Object => {
     let ast = {
       V: name,
     };
@@ -103,7 +104,15 @@ export const printAST = (expr: AnyExpr, style = PrintStyle.parenthesis, padLeft 
   const process = processor[style];
 
   // equivalent to visitXXXExpr
-  switch (expr.type) {
+  switch (expr?.type) {
+    case "block":
+      return process(expr.type, ...expr.statements);
+    case "print":
+      return process(expr.type, expr.expression);
+    case "expression":
+      return process(expr.type, expr.expression);
+    case "let":
+      return process(expr.type, { type: "variable", name: expr.name });
     case "assign":
       return process(expr.type, expr.value);
     case "ternary":

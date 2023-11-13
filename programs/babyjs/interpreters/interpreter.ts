@@ -259,9 +259,7 @@ export class Interpreter {
 
   private _debugStatement(stmt: AnyStmt) {
     // @ts-ignore
-    let expr: AnyExpr = stmt.expression || stmt.initializer;
-
-    if (!expr) return; // TODO: display AST for variable assignments
+    let expr: AnyExpr = stmt.expression || stmt.initializer || stmt;
 
     this.logger.log("lisp-like: ", printAST(expr, PrintStyle.parenthesis));
     this.logger.log("- - - - -");
