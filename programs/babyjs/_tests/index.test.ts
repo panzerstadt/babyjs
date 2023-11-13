@@ -29,6 +29,24 @@ describe("babyjs", () => {
     expect(logger.error).not.toHaveBeenCalled();
   });
 
+  describe("debug mode works", () => {
+    it("works with expressions", () => {
+      const code = "1+2;";
+      babyjs.runOnce(code, true);
+      expect(logger.error).not.toHaveBeenCalled();
+    });
+    it("works with assignments", () => {
+      const code = "let a;";
+      babyjs.runOnce(code, true);
+      expect(logger.error).not.toHaveBeenCalled();
+    });
+    it("works with block scoping", () => {
+      const code = "let a; { let a = 10; print a; } print a;";
+      babyjs.runOnce(code, true);
+      expect(logger.error).not.toHaveBeenCalled();
+    });
+  });
+
   it("print works", () => {
     const code = `print 1;`;
     babyjs.runOnce(code);
@@ -91,7 +109,7 @@ describe("babyjs", () => {
   });
 
   describe("variable assignment", () => {
-    it.only("works", () => {
+    it("works", () => {
       const code = `let a = 10; a = 20; print a;`;
       babyjs.runOnce(code, true);
 
