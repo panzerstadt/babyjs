@@ -16,6 +16,7 @@ export class Interpreter {
   }
 
   public interpret(statements: AnyStmt[], debug?: boolean): RuntimeError | undefined {
+    this.environment.setDebug(debug);
     try {
       if (statements.length === 1 && statements[0].type === "expression") {
         const statement = statements[0];
@@ -56,7 +57,7 @@ export class Interpreter {
       debug && this.environment.printEnvironment("newEnv");
 
       for (const statement of statements) {
-        this.execute(statement);
+        this.execute(statement, debug);
       }
     } finally {
       this.environment = previous;
@@ -261,7 +262,12 @@ export class Interpreter {
   public visitBlockStmt(stmt: Stmt["Block"], debug?: boolean): void {
     debug && this._debugStatement(stmt);
 
-    this.executeBlock(stmt.statements, new Environment(this.environment, debug));
+    // lexical scope env setup
+    const blockEnv = new Environment(this.environment);
+    blockEnv.setDebug(debug);
+    blockEnv.setLogger(this.logger);
+
+    this.executeBlock(stmt.statements, blockEnv, debug);
   }
 
   private _debugStatement(stmt: AnyStmt) {

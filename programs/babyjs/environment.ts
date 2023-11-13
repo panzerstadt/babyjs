@@ -12,15 +12,25 @@ export class Environment {
   readonly enclosing: Environment | null;
 
   public printEnvironment(op: string) {
-    this.logger.log(`op:${op} on ${this.identifier}:${this.values.size}`, this.values.entries());
+    let store = { id: this.identifier };
+    this.values.forEach((v, k) => {
+      store = { ...store, [k]: v };
+    });
+    this.logger.log(
+      `env:${op} on ${this.identifier}: size ${this.values.size}`,
+      ...JSON.stringify(store, null, 4).split("\n")
+    );
   }
 
-  constructor(enclosing?: Environment, debug?: boolean) {
+  constructor(enclosing?: Environment) {
     this.enclosing = enclosing || null;
-    this.identifier = `env-${Math.random() * 100}(${this.enclosing?.identifier})`;
-    if (!!debug) {
-      this.debug = debug;
-    }
+    this.identifier = `scope-${(Math.random() * 100000).toFixed(0)}(${
+      this.enclosing?.identifier ?? ""
+    })`;
+  }
+
+  setDebug(debug?: boolean) {
+    this.debug = debug ?? false;
   }
 
   setLogger(newLogger: LoggerType) {
@@ -48,6 +58,7 @@ e.g: let my_variable = "one"; ---> my_variable = "two";
     }
 
     this.values.set(name, value);
+    this.debug && this.printEnvironment(this.assign.name);
   }
 
   assign(name: Token, value: Object): void {
