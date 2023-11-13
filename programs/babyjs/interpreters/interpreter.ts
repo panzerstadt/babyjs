@@ -35,11 +35,27 @@ export class Interpreter {
         return this.visitPrintStmt(stmt, debug);
       case "let":
         return this.visitLetStmt(stmt, debug);
+      case "block":
+        return this.visitBlockStmt(stmt, debug);
     }
 
     // unreachable
     this.logger.error(`reached unreachable code at '${this.evaluate.name}'!`);
     return null;
+  }
+
+  private executeBlock(statements: AnyStmt[], environment: Environment, debug?: boolean) {
+    const previous = this.environment;
+    try {
+      this.environment = environment;
+      debug && this.environment.printEnvironment("newEnv");
+
+      for (const statement of statements) {
+        this.execute(statement);
+      }
+    } finally {
+      this.environment = previous;
+    }
   }
 
   // like printAST's process() method, is recursive
@@ -237,7 +253,9 @@ export class Interpreter {
     this.environment.define(stmt.name.lexeme, value, stmt.name);
   }
 
-  debugStatement(stmt: AnyStmt) {
+  public visitBlockStmt(stmt: Stmt["Block"], debug?: boolean): void {
+    this.executeBlock(stmt.statements, new Environment(this.environment, debug));
+  }
     // @ts-ignore
     let expr: AnyExpr = stmt.expression || stmt.initializer;
 

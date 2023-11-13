@@ -29,14 +29,25 @@ const letStmt = (name: Token, initializer: AnyExpr): Let => {
   return { type: "let", name, initializer };
 };
 
-export type AnyStmt = Expression | Print | Let;
+interface Block {
+  readonly type: "block";
+  readonly statements: AnyStmt[];
+}
+
+const blockStmt = (statements: AnyStmt[]): Block => {
+  return { type: "block", statements };
+};
+
+export type AnyStmt = Expression | Print | Let | Block;
 export interface Stmt {
   Expression: Expression;
   Print: Print;
   Let: Let;
+  Block: Block;
 }
 export const Stmt = {
   Expression: expression,
   Print: print,
   Let: letStmt,
+  Block: blockStmt,
 };

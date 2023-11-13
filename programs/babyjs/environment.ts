@@ -3,9 +3,25 @@ import { Token } from "./token";
 import { LoggerType } from "./types";
 
 export class Environment {
-  logger: Console | LoggerType = console;
-  private readonly values: Map<string, Object | null> = new Map();
   private strict = true;
+  private debug = false;
+  private identifier: string | null = null;
+  logger: Console | LoggerType = console;
+
+  private readonly values: Map<string, Object | null> = new Map();
+  readonly enclosing: Environment | null;
+
+  public printEnvironment(op: string) {
+    this.logger.log(`op:${op} on ${this.identifier}:${this.values.size}`, this.values.entries());
+  }
+
+  constructor(enclosing?: Environment, debug?: boolean) {
+    this.enclosing = enclosing || null;
+    this.identifier = `env-${Math.random() * 100}(${this.enclosing?.identifier})`;
+    if (!!debug) {
+      this.debug = debug;
+    }
+  }
 
   setLogger(newLogger: LoggerType) {
     this.logger = newLogger;
@@ -34,7 +50,7 @@ e.g: let my_variable = "one"; ---> my_variable = "two";
     this.values.set(name, value);
   }
 
-  assign(name: Token, value: Object) {
+  assign(name: Token, value: Object): void {
     const prevValue = this.values.get(name.lexeme);
     if (!!prevValue) {
       if (this.strict) {
@@ -44,16 +60,22 @@ e.g: let my_variable = "one"; ---> my_variable = "two";
         );
       }
       this.values.set(name.lexeme, value);
+      this.debug && this.printEnvironment(this.assign.name);
       return;
     }
+
+    if (this.enclosing !== null) return this.enclosing.assign(name, value);
 
     throw new RuntimeError(name, `Undefined variable '${name.lexeme}`);
   }
 
   get(name: Token): Object {
     if (this.values.has(name.lexeme)) {
+      this.debug && this.printEnvironment(this.get.name);
       return this.values.get(name.lexeme)!;
     }
+
+    if (this.enclosing !== null) return this.enclosing.get(name);
 
     throw new RuntimeError(name, `Undefined variable '${name.lexeme}'.`);
   }

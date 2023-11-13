@@ -32,10 +32,12 @@ declaration    → varDecl // variables for now, functions and classes later
                | statement ;
 
 statement      → exprStmt
-               | printStmt ;
+               | printStmt
+               | block ;
 
 exprStmt       → expression ";" ;
 printStmt      → "print" expression ";" ;   
+block          → "{" declaration* "}" ;
 varDecl        → "let" IDENTIFIER ( "=" expression )? ";"
 
 program represents a complete Lox script/repl entry.
@@ -330,8 +332,20 @@ export class Parser {
     return Stmt.Let(name, initializer!);
   }
 
+  private block() {
+    let statements = [];
+
+    while (!this.check(TokenType.RIGHT_BRACE) && !this.isAtEnd()) {
+      statements.push(this.declaration());
+    }
+
+    this.consume(TokenType.RIGHT_BRACE, "Expect '}' after block.");
+    return statements;
+  }
+
   private statement(): AnyStmt {
     if (this.match(TokenType.PRINT)) return this.printStatement();
+    if (this.match(TokenType.LEFT_BRACE)) return Stmt.Block(this.block());
 
     return this.expressionStatement();
   }
