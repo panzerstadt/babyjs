@@ -41,7 +41,7 @@ describe("babyjs", () => {
       expect(logger.error).not.toHaveBeenCalled();
     });
     it("works with block scoping", () => {
-      const code = "let a; { let a = 10; print a; } print a;";
+      const code = "let a; { let a = 10; print a; } a = 5; print a;";
       babyjs.runOnce(code, true);
       expect(logger.error).not.toHaveBeenCalled();
     });
@@ -115,6 +115,13 @@ describe("babyjs", () => {
 
       expect(logger.error).not.toHaveBeenCalled();
       expect(logger.log).toHaveBeenCalledWith(">>", 20);
+    });
+    it("does not allow accessing unassigned variables at runtime", () => {
+      const code = `let a; print a;`;
+      babyjs.runOnce(code);
+
+      expect(logger.error).toHaveBeenCalledWith(expect.stringContaining("Unassigned variable"));
+      expect(logger.log).not.toHaveBeenCalled();
     });
   });
 
