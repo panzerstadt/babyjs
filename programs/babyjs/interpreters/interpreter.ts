@@ -241,6 +241,8 @@ export class Interpreter {
     // @ts-ignore
     let expr: AnyExpr = stmt.expression || stmt.initializer;
 
+    if (!expr) return; // TODO: display AST for variable assignments
+
     this.logger.log("lisp-like: ", printAST(expr, PrintStyle.parenthesis));
     this.logger.log("- - - - -");
     this.logger.log("rpn      : ", printAST(expr, PrintStyle.rpn));
