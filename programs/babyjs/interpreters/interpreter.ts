@@ -17,6 +17,11 @@ export class Interpreter {
 
   public interpret(statements: AnyStmt[], debug?: boolean): RuntimeError | undefined {
     try {
+      if (statements.length === 1 && statements[0].type === "expression") {
+        const statement = statements[0];
+        this.visitPrintStmt({ type: "print", expression: statement.expression }, debug);
+        return;
+      }
       for (const statement of statements) {
         this.execute(statement, debug);
       }
