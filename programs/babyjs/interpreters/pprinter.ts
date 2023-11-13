@@ -104,6 +104,10 @@ export const printAST = (expr: AnyExpr, style = PrintStyle.parenthesis, padLeft 
 
   // equivalent to visitXXXExpr
   switch (expr.type) {
+    case "assign":
+      return process(expr.type, expr.value);
+    case "ternary":
+      return process(expr.type, expr.left, expr.center, expr.right);
     case "binary":
       // public String visitBinaryExpr(Expr.Binary expr) {
       //   return parenthesize(expr.operator.lexeme, expr.left, expr.right);
