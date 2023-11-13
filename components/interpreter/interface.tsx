@@ -4,12 +4,14 @@ import { useHistory } from "./useHistory";
 import { Tips } from "./tips";
 import { useStd } from "./useStd";
 
+export type Line = { type: LineType; value: string };
+type LineType = "out" | "err" | "info" | "usr" | "usr-tmp";
+const TABS = 4;
+
 interface InterpreterProps {
   focus?: number; // a random number to trigger a useEffect dep
   onResult?: () => void; // pipe out
 }
-export type Line = { type: LineType; value: string };
-type LineType = "out" | "err" | "info" | "usr" | "usr-tmp";
 export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
   const cursor = useRef<HTMLInputElement>(null);
   const terminal = useRef<HTMLDivElement>(null);
@@ -111,23 +113,33 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
     }, 300);
   };
 
+  const [toggledMultiline, setToggledMultiline] = useState(false);
   const handleKeydown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       if (e.shiftKey === true) {
+        handleMultiline();
+      } else if (toggledMultiline === true) {
         handleMultiline();
       } else {
         handleSendCode();
       }
     }
+    if (e.key === "Tab") {
+      if (e.shiftKey === false) {
+        setUserInputBuffer((p) => p + Array(TABS + 1).join(" "));
+      }
+      e.preventDefault();
+    }
 
-    if (e.key === "ArrowUp") {
-      back();
+    // switch inline/multiline modes
+    if (e.key === "Shift" && e.ctrlKey === true) {
+      setToggledMultiline((p) => !p);
       e.preventDefault();
     }
-    if (e.key === "ArrowDown") {
-      forward();
-      e.preventDefault();
-    }
+
+    // history
+    if (e.key === "ArrowUp") { back(); e.preventDefault(); } // prettier-ignore
+    if (e.key === "ArrowDown") { forward(); e.preventDefault(); } // prettier-ignore
   };
 
   const handleUserInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -152,16 +164,30 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
             </code>
           );
         })}
-        <input
-          ref={cursor}
-          onChange={handleUserInput}
-          onKeyDown={handleKeydown}
-          className="bg-transparent text-sky-500 w-full outline-none pb-1"
-          value={userInputBuffer}
-          placeholder=">_"
-        />
+        <div className="flex">
+          <input
+            ref={cursor}
+            onChange={handleUserInput}
+            onKeyDown={handleKeydown}
+            className="bg-transparent text-sky-500 w-full outline-none pb-1"
+            value={userInputBuffer}
+            placeholder=">_"
+          />
+          {toggledMultiline && (
+            <button
+              onClick={() => handleSendCode()}
+              className="text-sky-400 text-[10px] px-2 border border-sky-800 hover:bg-sky-400 hover:text-white rounded-md"
+            >
+              send
+            </button>
+          )}
+        </div>
         <div className="text-[10px] leading-[10px] italic font-bold text-gray-700 mt-0 select-none group">
-          <span>shift to multiline</span>
+          <span>
+            <span>shift + enter to </span>
+            <span className={toggledMultiline ? "text-yellow-300" : ""}>multiline</span>
+            <span>, ctrl + shift to toggle</span>
+          </span>
           <Tips />
         </div>
         <div onClick={() => handleFocusOnCursor()} className="flex flex-grow h-full">
