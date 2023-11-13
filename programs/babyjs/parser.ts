@@ -130,7 +130,7 @@ export class Parser {
     let count = chains;
     if (this.match(TokenType.QUESTION)) {
       count++;
-      if (count === 1) {
+      if (count === 2) {
         this.logger.info?.(
           `if looks like you're chaining ternary operators, and that might make your code harder to read. maybe try separating your comparison code into individual lines, or explicitly add parentheses to denote ordering?`
         );
@@ -142,7 +142,7 @@ export class Parser {
       this.consume(TokenType.COLON, "Expect ':' after middle ternary expression.");
       const rightOp = this.previous(); // consume, then rewind to grab token
 
-      const right = this.ternary(1);
+      const right = this.ternary(count++);
 
       expr = Expr.Ternary(expr, leftOp, center, rightOp, right);
     }
