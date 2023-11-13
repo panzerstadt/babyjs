@@ -228,13 +228,13 @@ export class Interpreter {
    * STATEMENTS (Primitives)
    */
   public visitExpressionStmt(stmt: Stmt["Expression"], debug = false): void {
-    debug && this.debugStatement(stmt);
+    debug && this._debugStatement(stmt);
 
     this.evaluate(stmt.expression);
   }
 
   public visitPrintStmt(stmt: Stmt["Print"], debug?: boolean): void {
-    debug && this.debugStatement(stmt);
+    debug && this._debugStatement(stmt);
 
     const value = this.evaluate(stmt.expression);
 
@@ -243,7 +243,7 @@ export class Interpreter {
   }
 
   public visitLetStmt(stmt: Stmt["Let"], debug?: boolean): void {
-    debug && this.debugStatement(stmt);
+    debug && this._debugStatement(stmt);
 
     let value = NULL_LITERAL as Object;
     if (stmt.initializer !== null) {
@@ -256,6 +256,8 @@ export class Interpreter {
   public visitBlockStmt(stmt: Stmt["Block"], debug?: boolean): void {
     this.executeBlock(stmt.statements, new Environment(this.environment, debug));
   }
+
+  private _debugStatement(stmt: AnyStmt) {
     // @ts-ignore
     let expr: AnyExpr = stmt.expression || stmt.initializer;
 
