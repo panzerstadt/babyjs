@@ -39,7 +39,9 @@ e.g: let my_variable = "one"; ---> my_variable = "two";
     if (!!prevValue) {
       if (this.strict) {
         // TODO: check if mut (also introduce explicit mut, like rust)
-        this.logger.info?.(`reassigning value "${name.lexeme}" to "${value}"`);
+        this.logger.info?.(
+          `reassigning value "${name.lexeme}" to "${value}". TODO: restrict this, or make mutatable variables obvious like rust's 'mut'`
+        );
       }
       this.values.set(name.lexeme, value);
       return;
