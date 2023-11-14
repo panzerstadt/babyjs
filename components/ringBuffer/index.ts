@@ -5,13 +5,14 @@
  *
  * Ring Buffer internal array size = user defined size + 1 (to tell if buffer is full)
  */
-export class RingBuffer<T> {
+export class RingBuffer<T extends Object> {
   private array: Array<T | undefined>;
   private readIdx = 0; // read head always contains item, except when read head == write head
   private writeIdx = 0; // write head is always empty, since it always increments after writing
 
   constructor(size: number) {
     this.array = new Array(size + 1).fill(undefined);
+    this._debug("init");
   }
 
   private _increment(head: "read" | "write") {
@@ -37,10 +38,6 @@ export class RingBuffer<T> {
     }
   }
 
-  private _validate() {
-    if (this.readIdx > this.writeIdx)
-      throw new Error("read head is in front of write head. this should not happen.");
-  }
   /**
    * O(1) The start and end indexes are not enough to tell buffer full or empty state
    * while also utilizing all buffer slots,[5] but can if the buffer only has a
@@ -50,7 +47,7 @@ export class RingBuffer<T> {
     // if next idx is the same as read idx, then it's full
     return this._peek_next_idx("write") === this.readIdx;
   }
-  private _debug() {
+  private _debug(op: string) {
     const viz = this.array.map((v, i) => {
       let value = v ?? "_";
 
@@ -63,13 +60,13 @@ export class RingBuffer<T> {
       return value;
     });
 
-    console.log(`w:${this.writeIdx} r:${this.readIdx} v:${viz}`);
+    console.log(`op:${op} w:${this.writeIdx} r:${this.readIdx} v:${viz}`);
   }
 
   // O(1)
   public clear() {
     this.writeIdx = this.readIdx;
-    this._debug();
+    this._debug("clear");
   }
   public values(): Array<T | undefined> {
     return this.array.slice(0, -1);
@@ -91,8 +88,8 @@ export class RingBuffer<T> {
     if (this._is_full()) return false;
 
     this.array[this.writeIdx] = item;
+    this._debug(`w_idx ${this.writeIdx}`);
     this._increment("write");
-    this._debug();
     return true;
   }
 
@@ -101,9 +98,10 @@ export class RingBuffer<T> {
    * @returns item
    */
   public read(): T | undefined {
-    if (this.readIdx >= this.writeIdx) return undefined;
+    if (this.readIdx === this.writeIdx) return undefined;
 
     const result = this.array[this.readIdx];
+    this._debug(`r_idx ${this.readIdx}`);
     this._increment("read");
 
     return result;
@@ -119,8 +117,6 @@ export class RingBuffer<T> {
     let results: typeof this.array = [];
 
     for (let i = count; i > 0; i--) {
-      this._validate();
-
       const result = this.read();
       if (!result) return results;
       results.push(result);

@@ -4,6 +4,8 @@ describe("RingBuffer", () => {
   it("works", () => {
     const buffer = new RingBuffer<number>(3);
 
+    expect(buffer.read()).toBe(undefined);
+
     buffer.write(1);
     buffer.write(2);
     buffer.write(3);
@@ -18,5 +20,9 @@ describe("RingBuffer", () => {
 
     buffer.clear();
     expect(buffer.read()).toBe(undefined);
+
+    buffer.write(6);
+    buffer.write(7);
+    expect(buffer.read_batch(100)).toStrictEqual([6, 7]);
   });
 });
