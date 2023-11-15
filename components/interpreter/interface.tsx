@@ -25,9 +25,9 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
   useEffect(() => {
     program.current = new Program();
   }, []);
-  useStd(program, "out", setLines);
-  useStd(program, "err", setLines);
-  useStd(program, "info", setLines);
+  useStd(program, "out", setLines, () => scrollToBottom());
+  useStd(program, "err", setLines, () => scrollToBottom());
+  useStd(program, "info", setLines, () => scrollToBottom());
 
   const [userHistory, { back, forward, add }] = useHistory();
   useEffect(() => {
@@ -161,7 +161,9 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
           return (
             <code
               key={i}
-              className={`${styles[s.type]} whitespace-break-spaces hover:bg-slate-800`}
+              className={`
+              ${styles[s.type]} hover:bg-slate-800
+              animate-fade whitespace-break-spaces`}
             >
               {s.value}
             </code>
@@ -172,7 +174,7 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
             ref={cursor}
             onChange={handleUserInput}
             onKeyDown={handleKeydown}
-            className="bg-transparent text-sky-500 w-full outline-none pb-1"
+            className="bg-transparent text-sky-500 w-full outline-none pb-5"
             value={userInputBuffer}
             placeholder=">_"
           />
@@ -185,7 +187,7 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
             </button>
           )}
         </div>
-        <div className="text-[10px] leading-[10px] italic font-bold text-gray-700 mt-0 select-none group">
+        <div className="-mt-4 text-[10px] leading-[10px] italic font-bold text-gray-700 select-none group">
           <span>
             <span>shift + enter to </span>
             <span className={toggledMultiline ? "text-yellow-300" : ""}>multiline</span>

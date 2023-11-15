@@ -10,7 +10,8 @@ const removeTimestamp = (str: string) => {
 export const useStd = (
   ref: MutableRefObject<Program | undefined>,
   stdType: "out" | "err" | "info",
-  setLines: Dispatch<SetStateAction<Line[]>>
+  setLines: Dispatch<SetStateAction<Line[]>>,
+  onLineOut?: () => void
 ) => {
   const currentRef = ref.current?.[`std${stdType}`];
   useEffect(() => {
@@ -18,6 +19,16 @@ export const useStd = (
     const std = currentRef
       .split("\n")
       .map((s) => ({ type: stdType, value: removeTimestamp(s) || " " }));
-    std && setLines((p) => [...p, ...std]);
+
+    if (std) {
+      // i like a chill stdout
+      std.forEach((s, i) => {
+        setTimeout(() => {
+          setLines((p) => [...p, s]);
+          onLineOut?.();
+        }, 50 * i);
+      });
+    }
+    // std && setLines((p) => [...p, ...std]);
   }, [currentRef, stdType, setLines]);
 };
