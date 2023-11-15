@@ -65,15 +65,23 @@ hey there welcome to my toy programming language! you might notice that it looks
 
 here are some things you can do with it right now.
 
-let one = 1;
+-----------------
+
+let one = 1; // variable declaration
 let two = one + 2;
 { // blocks
-  two = 42;
+  two = 42; // variable assignment
   print two;
 }
 print two;
 
-print (2/5.5+2)-2.5;
+print (2/5.5+2)-2.5; // arithmetic
+
+// logical operators
+print 1 > 2 or "result";
+print 1 > 2 || "result";
+print 1 > 2 and "skipped";
+print 1 > 2 && "skipped";
 
 // ternaries
 let three = two == 3 ? "yes" : "no";
@@ -86,6 +94,9 @@ if (1 > 2) print "nein"; else print "math checks out";
 if (true) {
   print "js brackets are a go"
 }
+
+// come back from time to time to see this list grow!
+-----------------
 
 here are some cli commands that have been implemented so far:
 
