@@ -361,7 +361,6 @@ export class Parser {
   }
 
   private statement(): AnyStmt {
-    console.log("AT STATEMENT", this.peek());
     if (this.match(TokenType.IF)) return this.ifStatement();
     if (this.match(TokenType.PRINT)) return this.printStatement();
     if (this.match(TokenType.LEFT_BRACE)) return Stmt.Block(this.block());
