@@ -113,6 +113,12 @@ export class Scanner {
       case "<":
         this.addToken(this.match("=") ? TokenType.LESS_EQUAL : TokenType.LESS);
         break;
+      case "&":
+        this.match("&") && this.addToken(TokenType.AND);
+        break;
+      case "|":
+        this.match("|") && this.addToken(TokenType.OR);
+        break;
       case "*":
         // only for multiline comment case
         // if '*/'

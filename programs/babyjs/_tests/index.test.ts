@@ -221,6 +221,13 @@ describe("babyjs", () => {
         expect(logger.error).not.toHaveBeenCalled();
         expect(logger.log).toHaveBeenCalledWith(">>", "GOAL");
       });
+      it("&& is aliased to 'and'", () => {
+        const code = `print true && "GOAL";`;
+        babyjs.runOnce(code);
+
+        expect(logger.error).not.toHaveBeenCalled();
+        expect(logger.log).toHaveBeenCalledWith(">>", "GOAL");
+      });
       it("false left expression short circuits", () => {
         const code = `print false and "NOPE";`;
         babyjs.runOnce(code);
@@ -240,6 +247,13 @@ describe("babyjs", () => {
     describe("or", () => {
       it("if left expression is false, evaluates right", () => {
         const code = `print false or "GOAL";`;
+        babyjs.runOnce(code);
+
+        expect(logger.error).not.toHaveBeenCalled();
+        expect(logger.log).toHaveBeenCalledWith(">>", "GOAL");
+      });
+      it("|| is aliased to 'or'", () => {
+        const code = `print false || "GOAL";`;
         babyjs.runOnce(code);
 
         expect(logger.error).not.toHaveBeenCalled();
