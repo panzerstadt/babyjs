@@ -32,10 +32,13 @@ declaration    → varDecl // variables for now, functions and classes later
                | statement ;
 
 statement      → exprStmt
+               | ifStmt
                | printStmt
                | block ;
 
 exprStmt       → expression ";" ;
+ifStmt         → "if" "(" expression ")" statement
+                 ( "else" statement )? ;
 printStmt      → "print" expression ";" ;   
 block          → "{" declaration* "}" ;
 varDecl        → "let" IDENTIFIER ( "=" expression )? ";"
@@ -306,6 +309,20 @@ export class Parser {
     }
   }
 
+  private ifStatement() {
+    this.consume(TokenType.LEFT_PAREN, "Expect '(' after 'if'");
+    const condition = this.expression();
+    this.consume(TokenType.RIGHT_PAREN, "Expect ')' after 'if' condition");
+
+    const thenBranch = this.statement();
+    let elseBranch;
+    if (this.match(TokenType.ELSE)) {
+      elseBranch = this.statement();
+    }
+
+    return Stmt.If(condition, thenBranch, elseBranch);
+  }
+
   private printStatement() {
     const value = this.expression();
     this.consume(TokenType.SEMICOLON, "Expect ';' after value.");
@@ -344,6 +361,8 @@ export class Parser {
   }
 
   private statement(): AnyStmt {
+    console.log("AT STATEMENT", this.peek());
+    if (this.match(TokenType.IF)) return this.ifStatement();
     if (this.match(TokenType.PRINT)) return this.printStatement();
     if (this.match(TokenType.LEFT_BRACE)) return Stmt.Block(this.block());
 

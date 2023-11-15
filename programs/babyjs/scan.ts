@@ -241,6 +241,9 @@ export class Scanner {
     const text = this.source.substring(this.start, this.current);
     let identifierType = keywords[text as keyof typeof keywords];
     if (!identifierType) {
+      console.warn(
+        `did not find matching identifierType for keyword: ${text}. default to IDENTIFIER`
+      );
       const didYouMean = accidentalKeywords[text as keyof typeof accidentalKeywords];
       if (!!didYouMean) {
         this._error.error(this.line, didYouMean, this.source, this.current);

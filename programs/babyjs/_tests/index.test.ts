@@ -160,6 +160,16 @@ describe("babyjs", () => {
     });
   });
 
+  describe("if else", () => {
+    it.only("works", () => {
+      const code = `if (true) print "GOAL";`;
+      babyjs.runOnce(code);
+
+      expect(logger.error).not.toHaveBeenCalled();
+      expect(logger.log).toHaveBeenCalledWith(">>", "GOAL");
+    });
+  });
+
   describe("ternary operators", () => {
     /**
     const a = false; // "a";

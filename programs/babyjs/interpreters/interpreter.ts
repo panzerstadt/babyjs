@@ -37,6 +37,8 @@ export class Interpreter {
     switch (stmt.type) {
       case "expression":
         return this.visitExpressionStmt(stmt, debug);
+      case "if":
+        return this.visitIfStmt(stmt, debug);
       case "print":
         return this.visitPrintStmt(stmt, debug);
       case "let":
@@ -237,6 +239,17 @@ export class Interpreter {
     debug && this._debugStatement(stmt);
 
     this.evaluate(stmt.expression);
+  }
+
+  public visitIfStmt(stmt: Stmt["If"], debug?: boolean) {
+    debug && this._debugStatement(stmt);
+
+    if (this.isTruthy(this.evaluate(stmt.condition))) {
+      this.execute(stmt.thenBranch);
+    } else if (!!stmt.elseBranch) {
+      this.execute(stmt.elseBranch);
+    }
+    return null;
   }
 
   public visitPrintStmt(stmt: Stmt["Print"], debug?: boolean): void {

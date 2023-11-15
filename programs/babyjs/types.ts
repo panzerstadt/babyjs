@@ -50,12 +50,12 @@ export enum TokenType {
 
   FOR = "FOR",
   IF = "IF",
+  ELSE = "ELSE",
   WHILE = "WHILE",
   PRINT = "PRINT",
   RETURN = "RETURN",
 
   // AND,
-  // ELSE,
   // OR,
   // SUPER,
   // THIS,
