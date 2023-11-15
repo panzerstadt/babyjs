@@ -1,5 +1,5 @@
-import { AnyExpr } from "../primitives/expressions";
-import { AnyStmt } from "../primitives/statements";
+import { AnyExpr } from "../constructs/expressions";
+import { AnyStmt } from "../constructs/statements";
 import { NULL_LITERAL } from "../token";
 
 /**

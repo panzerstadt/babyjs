@@ -1,7 +1,7 @@
 import { Environment } from "../environment";
 import { RuntimeError } from "../errors";
-import { AnyExpr, Expr } from "../primitives/expressions";
-import { AnyStmt, Stmt } from "../primitives/statements";
+import { AnyExpr, Expr } from "../constructs/expressions";
+import { AnyStmt, Stmt } from "../constructs/statements";
 import { NULL_LITERAL, Token } from "../token";
 import { LoggerType, TokenType } from "../types";
 import { PrintStyle, printAST } from "./pprinter";
