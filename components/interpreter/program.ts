@@ -51,7 +51,7 @@ export class Program {
       return;
     }
     if (code === "help") {
-      this.stdout = `${this.timestamp()}:${this.help()}`;
+      this.stdout = `${this.help()}`;
       return;
     }
 
@@ -61,22 +61,42 @@ export class Program {
 
   help(): string {
     return `
-    hey there welcome to my toy programming language! you might notice that it looks
-    really similar to javascript.
+hey there welcome to my toy programming language! you might notice that it looks really similar to javascript.
 
-    here are some things you can do with it right now.
+here are some things you can do with it right now.
 
-    let one = 1;
-    let two = one + 2;
-    print two;
+let one = 1;
+let two = one + 2;
+{ // blocks
+  two = 42;
+  print two;
+}
+print two;
 
-    print (2/5.5+2)-2.5;
+print (2/5.5+2)-2.5;
 
-    here are the other options that have been implemented so far:
+// ternaries
+let three = two == 3 ? "yes" : "no";
 
-    help :  this message.
-    vvvv :  switches on verbose mode. explore the innards of how a program
-            gets understood by the interpreter!
-    `;
+// control flow
+if (three == "yes") print "wow";
+
+if (1 > 2) print "nein"; else print "math checks out";
+
+if (true) {
+  print "js brackets are a go"
+}
+
+here are some cli commands that have been implemented so far:
+
+help  :  this message.
+clear :  clears the terminal.
+vvvv  :  toggles verbose mode. explore the innards of how a program
+         gets understood by the interpreter!
+    `
+
+      .split("\n")
+      .map((s) => `${this.timestamp()}:${s}\n`)
+      .join("");
   }
 }

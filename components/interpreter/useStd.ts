@@ -1,10 +1,10 @@
 import { Dispatch, MutableRefObject, SetStateAction, useEffect } from "react";
 import { Program } from "./program";
 import { Line } from "./interface";
-import { given } from "flooent";
 
 const removeTimestamp = (str: string) => {
-  return given.string(str).after(":").toString();
+  const length = Date.now().toString().length + ":".length;
+  return str.slice(length);
 };
 
 export const useStd = (
