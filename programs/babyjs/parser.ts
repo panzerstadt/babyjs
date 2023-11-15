@@ -14,7 +14,9 @@ Parser = reads Tokens left to right
 Expression Grammar for this parser in Backus-Naur Form (BNF) (subset of statement grammar)
 expression     → assignment ;
 assignment     → IDENTIFIER "=" assignment
-               | ternary ;
+               | logic_or ;
+logic_or       → logic_and ( "or" logic_and )* ;
+logic_and      → ternary ( "and" ternary )* ;
 ternary        → equality ( "?" expression ":" ternary )* ;
 equality       → comparison ( ( "!=" | "==" ) comparison )* ;
 comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
@@ -110,7 +112,7 @@ export class Parser {
 
   // assignment -> IDENTIFIER "=" assignemt | ternary
   private assignment(): AnyExpr {
-    let expr = this.ternary();
+    let expr = this.or();
 
     // its possible to have more than a single token lookahead
     // e.g. makeList().head.next = node;
@@ -124,6 +126,30 @@ export class Parser {
       }
 
       this.error(equals, `Invalid assignment target.`);
+    }
+
+    return expr;
+  }
+
+  private or() {
+    let expr = this.and();
+
+    while (this.match(TokenType.OR)) {
+      const operator = this.previous();
+      const right = this.and();
+      expr = Expr.Logical(expr, operator, right);
+    }
+
+    return expr;
+  }
+
+  private and() {
+    let expr = this.ternary();
+
+    while (this.match(TokenType.AND)) {
+      const operator = this.previous();
+      const right = this.ternary();
+      expr = Expr.Logical(expr, operator, right);
     }
 
     return expr;

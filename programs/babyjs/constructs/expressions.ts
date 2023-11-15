@@ -64,6 +64,17 @@ const literal = (value: Object): Literal => {
   return { type: "literal", value };
 };
 
+interface Logical {
+  readonly type: "logical";
+  readonly left: AnyExpr;
+  readonly operator: Token;
+  readonly right: AnyExpr;
+}
+
+const logical = (left: AnyExpr, operator: Token, right: AnyExpr): Logical => {
+  return { type: "logical", left, operator, right };
+};
+
 interface Unary {
   readonly type: "unary";
   readonly operator: Token;
@@ -96,12 +107,13 @@ const variable = (name: Token): Variable => {
   return { type: "variable", name };
 };
 
-export type AnyExpr = Ternary | Binary | Grouping | Literal | Unary | Variable | Assign;
+export type AnyExpr = Ternary | Binary | Grouping | Literal | Logical | Unary | Variable | Assign;
 export interface Expr {
   Ternary: Ternary;
   Binary: Binary;
   Grouping: Grouping;
   Literal: Literal;
+  Logical: Logical;
   Unary: Unary;
   Variable: Variable;
   Assign: Assign;
@@ -111,6 +123,7 @@ export const Expr = {
   Binary: binary,
   Grouping: grouping,
   Literal: literal,
+  Logical: logical,
   Unary: unary,
   Variable: variable,
   Assign: assign,

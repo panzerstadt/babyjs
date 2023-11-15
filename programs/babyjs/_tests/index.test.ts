@@ -79,7 +79,7 @@ describe("babyjs", () => {
 
       expect(logger.log).toHaveBeenCalledWith(">>", true);
     });
-    it("does not typecast in comparisons (similar to js strict equality 'a === b'", () => {
+    it("does not typecast in comparisons (similar to js strict equality 'a === b')", () => {
       const code = `print 1 == "1";`;
       babyjs.runOnce(code);
 
@@ -161,12 +161,104 @@ describe("babyjs", () => {
   });
 
   describe("if else", () => {
-    it.only("works", () => {
+    it("if works", () => {
       const code = `if (true) print "GOAL";`;
       babyjs.runOnce(code);
 
       expect(logger.error).not.toHaveBeenCalled();
       expect(logger.log).toHaveBeenCalledWith(">>", "GOAL");
+    });
+    it("if else works", () => {
+      const code = `if (false) print "NOPE"; else print "GOAL";`;
+      babyjs.runOnce(code);
+
+      expect(logger.error).not.toHaveBeenCalled();
+      expect(logger.log).toHaveBeenCalledWith(">>", "GOAL");
+    });
+    it("if with curly braces works", () => {
+      const code = `if (true) { print "GOAL"; }`;
+      babyjs.runOnce(code);
+
+      expect(logger.error).not.toHaveBeenCalled();
+      expect(logger.log).toHaveBeenCalledWith(">>", "GOAL");
+    });
+    it("if else with curly braces works", () => {
+      const code = `if (false) { print "NOPE"; } else { print "GOAL"; }`;
+      babyjs.runOnce(code);
+
+      expect(logger.error).not.toHaveBeenCalled();
+      expect(logger.log).toHaveBeenCalledWith(">>", "GOAL");
+    });
+    it("chains without curly braces (but best not to do this), where else applies to closest if condition", () => {
+      const code = `if (true) if (false) print "NOPE"; else print "GOAL";`;
+      babyjs.runOnce(code);
+
+      expect(logger.error).not.toHaveBeenCalled();
+      expect(logger.log).toHaveBeenCalledWith(">>", "GOAL");
+    });
+    it("if, else if, works with curly braces", () => {
+      const code = `if (false) { print "NOPE"; } else if (true) { print "GOAL"; }`;
+      babyjs.runOnce(code);
+
+      expect(logger.error).not.toHaveBeenCalled();
+      expect(logger.log).toHaveBeenCalledWith(">>", "GOAL");
+    });
+    it("if, else if, else, works with curly braces", () => {
+      const code = `if (false) { print "NOPE"; } else if (false) { print "NOPE"; } else { print "GOAL"; }`;
+      babyjs.runOnce(code);
+
+      expect(logger.error).not.toHaveBeenCalled();
+      expect(logger.log).toHaveBeenCalledWith(">>", "GOAL");
+    });
+  });
+
+  describe("logical operators", () => {
+    describe("and", () => {
+      it("true left expression also evaluates right expression", () => {
+        const code = `print true and "GOAL";`;
+        babyjs.runOnce(code);
+
+        expect(logger.error).not.toHaveBeenCalled();
+        expect(logger.log).toHaveBeenCalledWith(">>", "GOAL");
+      });
+      it("false left expression short circuits", () => {
+        const code = `print false and "NOPE";`;
+        babyjs.runOnce(code);
+
+        expect(logger.error).not.toHaveBeenCalled();
+        expect(logger.log).toHaveBeenCalledWith(">>", false);
+      });
+      it("chains", () => {
+        const code = `print true and true and true and "GOAL";`;
+        babyjs.runOnce(code);
+
+        expect(logger.error).not.toHaveBeenCalled();
+        expect(logger.log).toHaveBeenCalledWith(">>", "GOAL");
+      });
+    });
+
+    describe("or", () => {
+      it("if left expression is false, evaluates right", () => {
+        const code = `print false or "GOAL";`;
+        babyjs.runOnce(code);
+
+        expect(logger.error).not.toHaveBeenCalled();
+        expect(logger.log).toHaveBeenCalledWith(">>", "GOAL");
+      });
+      it("if left expression is true, evaluates left", () => {
+        const code = `print "GOAL" or false;`;
+        babyjs.runOnce(code);
+
+        expect(logger.error).not.toHaveBeenCalled();
+        expect(logger.log).toHaveBeenCalledWith(">>", "GOAL");
+      });
+      it("chains", () => {
+        const code = `print false or false or false or "GOAL";`;
+        babyjs.runOnce(code);
+
+        expect(logger.error).not.toHaveBeenCalled();
+        expect(logger.log).toHaveBeenCalledWith(">>", "GOAL");
+      });
     });
   });
 

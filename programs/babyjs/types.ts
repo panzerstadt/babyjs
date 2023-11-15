@@ -55,8 +55,8 @@ export enum TokenType {
   PRINT = "PRINT",
   RETURN = "RETURN",
 
-  // AND,
-  // OR,
+  AND = "AND",
+  OR = "OR",
   // SUPER,
   // THIS,
 

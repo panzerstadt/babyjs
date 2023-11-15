@@ -77,6 +77,8 @@ export class Interpreter {
         return this.visitGroupingExpr(expr);
       case "literal":
         return this.visitLiteralExpr(expr);
+      case "logical":
+        return this.visitLogicalExpr(expr);
       case "unary":
         return this.visitUnaryExpr(expr);
       case "variable":
@@ -93,10 +95,12 @@ export class Interpreter {
 
   // https://chat.openai.com/share/ba09a5f7-a8a4-4401-aa24-898c91c89d40
   private isTruthy(object: Object): boolean {
+    console.log("what is object", object);
     if (object === NULL_LITERAL) return false;
     if (object === null) return false;
     if (object === undefined) return false;
     if (typeof object === "boolean") return Boolean(object);
+    console.log("i think goal is true", object);
     return true;
   }
 
@@ -133,6 +137,24 @@ export class Interpreter {
   // literal is leaf node of the expression, it holds the value
   public visitLiteralExpr(expr: Expr["Literal"]): Object | number {
     return expr.value!;
+  }
+
+  public visitLogicalExpr(expr: Expr["Logical"]): Object {
+    const left = this.evaluate(expr.left);
+
+    // JavaScript supports C style switch case fall through,
+    // which means unless there is a break specified, it will
+    // continue to execute all the subsequent cases.
+    switch (expr.operator.type) {
+      case TokenType.OR:
+        if (this.isTruthy(left)) return left;
+        break;
+      case TokenType.AND:
+        if (!this.isTruthy(left)) return left;
+        break;
+    }
+
+    return this.evaluate(expr.right);
   }
 
   public visitGroupingExpr(expr: Expr["Grouping"]): Object {

@@ -39,6 +39,8 @@ export const keywords = {
   false: TokenType.FALSE,
   true: TokenType.TRUE,
   nil: TokenType.NIL,
+  and: TokenType.AND,
+  or: TokenType.OR,
 } as const;
 
 export const accidentalKeywords = {
