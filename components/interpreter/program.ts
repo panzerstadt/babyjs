@@ -92,8 +92,23 @@ if (three == "yes") print "wow";
 if (1 > 2) print "nein"; else print "math checks out";
 
 if (true) {
-  print "js brackets are a go"
+  print "js brackets are a go";
+} else if {
+  print "all the ifs";
 }
+
+let also = true;
+if (also)
+  print "but they're syntactic sugar";
+  if (1 + 1 == 2)
+    print "and you don't really need them";
+  else if (2 + 2 = 4)
+    print "but it might feel a bit weird";
+  else
+    print "but to each their own";
+else
+  print "also, the above white space doesn't matter";
+
 
 // come back from time to time to see this list grow!
 -----------------
