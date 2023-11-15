@@ -159,7 +159,10 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
             info: "text-orange-700 text-[11px] leading-[13px] select-none",
           };
           return (
-            <code key={i} className={`${styles[s.type]} whitespace-break-spaces`}>
+            <code
+              key={i}
+              className={`${styles[s.type]} whitespace-break-spaces hover:bg-slate-800`}
+            >
               {s.value}
             </code>
           );
