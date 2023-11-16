@@ -3,7 +3,7 @@ import { RuntimeError } from "../errors";
 import { AnyExpr, Expr } from "../constructs/expressions";
 import { AnyStmt, Stmt } from "../constructs/statements";
 import { NULL_LITERAL, Token } from "../token";
-import { LoggerType, TokenType } from "../types";
+import { LoggerType, TokenType, assertNever } from "../types";
 import { PrintStyle, printAST } from "./pprinter";
 
 export class Interpreter {
@@ -45,6 +45,8 @@ export class Interpreter {
         return this.visitLetStmt(stmt, debug);
       case "block":
         return this.visitBlockStmt(stmt, debug);
+      default:
+        assertNever(stmt);
     }
 
     // unreachable
@@ -85,6 +87,8 @@ export class Interpreter {
         return this.visitVariableExpr(expr);
       case "assign":
         return this.visitAssignExpr(expr);
+      default:
+        assertNever(expr);
     }
 
     // unreachable

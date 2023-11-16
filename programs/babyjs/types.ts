@@ -1,3 +1,5 @@
+export const assertNever = (_variable: never): void => {};
+
 export enum TokenType {
   // Single-character tokens.
   LEFT_BRACE = "LEFT_BRACE", // node block
