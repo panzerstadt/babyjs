@@ -248,7 +248,7 @@ export class Scanner {
     let identifierType = keywords[text as keyof typeof keywords];
     if (!identifierType) {
       console.warn(
-        `did not find matching identifierType for keyword: ${text}. default to IDENTIFIER`
+        `did not find matching identifierType for keyword: '${text}'. default to IDENTIFIER`
       );
       const didYouMean = accidentalKeywords[text as keyof typeof accidentalKeywords];
       if (!!didYouMean) {
