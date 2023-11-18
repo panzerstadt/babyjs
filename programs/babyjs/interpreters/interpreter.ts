@@ -31,7 +31,6 @@ export class Interpreter {
     } catch (runtimeError) {
       // this.logger.log("runtime error", runtimeError);
       return runtimeError as RuntimeError;
-      // lox.runtimeError(error);
     }
   }
 
