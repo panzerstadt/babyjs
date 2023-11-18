@@ -34,12 +34,15 @@ declaration    → varDecl // variables for now, functions and classes later
                | statement ;
 
 statement      → exprStmt
+               | forStmt
                | ifStmt
                | printStmt
                | whileStmt
                | block ;
 
 exprStmt       → expression ";" ;
+forStmt        → "for" "(" (varDecl | exprStmt | ";"" ) expression? ";" expression? ")" statement  // for loops are considered syntactic sugar, since you can actually do what for loops to with pieces of other statements
+               | "for" "[" expression ".." expression "]" statement
 whileStmt      → "while" "(" expression ")" statement ;
 ifStmt         → "if" "(" expression ")" statement
                  ( "else" statement )? ;
@@ -337,6 +340,41 @@ export class Parser {
     }
   }
 
+  // 'desugaring', or turning syntactic sugar into its underlying implementation
+  // since for loops can be made up of other statments, we can 'desugar' it
+  private forStatement() {
+    this.consume(TokenType.LEFT_PAREN, "Expect  '(' after  'for'.");
+
+    // for (<HERE>; i < len; i++) { ... }
+    let initializer;
+    if (this.match(TokenType.SEMICOLON)) {
+      // e.g. https://www.quora.com/Is-it-possible-to-write-a-for-loop-in-C-without-initializing-any-variable
+      initializer = null;
+    } else if (this.match(TokenType.LET)) {
+      initializer = this.varDeclaration();
+    } else {
+      initializer = this.expressionStatement();
+    }
+
+    // for (let i = 0; <HERE>; i++) { ... }
+    let condition = null;
+    if (!this.check(TokenType.SEMICOLON)) {
+      condition = this.expression();
+    }
+    this.consume(TokenType.SEMICOLON, "Expect ';' after loop condition.");
+
+    // for (let i = 0; i < len; <HERE>) { ... }
+    let increment = null;
+    if (!this.check(TokenType.RIGHT_PAREN)) {
+      increment = this.expression();
+    }
+    this.consume(TokenType.RIGHT_PAREN, "Expect ')' after 'for' clauses");
+
+    // for (let i = 0; i < len; i++) { <HERE> }
+    let body = this.statement();
+    return body;
+  }
+
   private whileStatement() {
     this.consume(TokenType.LEFT_PAREN, "Expect '(' after 'while'");
     const condition = this.expression();
@@ -398,6 +436,7 @@ export class Parser {
   }
 
   private statement(): AnyStmt {
+    if (this.match(TokenType.FOR)) return this.forStatement();
     if (this.match(TokenType.IF)) return this.ifStatement();
     if (this.match(TokenType.PRINT)) return this.printStatement();
     if (this.match(TokenType.WHILE)) return this.whileStatement();
