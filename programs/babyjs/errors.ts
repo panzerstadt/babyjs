@@ -116,9 +116,9 @@ export class ParseError {
 
 // Errors in interpreter are DYNAMIC errors
 export class RuntimeError extends Error {
-  readonly token: Token;
+  readonly token?: Token;
 
-  constructor(token: Token, message: string) {
+  constructor(message: string, token?: Token) {
     super(message);
     this.token = token;
   }

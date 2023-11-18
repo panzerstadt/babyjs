@@ -120,17 +120,17 @@ export class Interpreter {
 
   private checkNumberOperand(operator: Token, operand: Object) {
     if (typeof operand === "number") return;
-    throw new RuntimeError(operator, "Operand must be a number.");
+    throw new RuntimeError("Operand must be a number.", operator);
   }
 
   private checkNumberOperands(operator: Token, firstOperand: Object, secondOperand: Object) {
     if (typeof firstOperand === "number" && typeof secondOperand === "number") return;
-    throw new RuntimeError(operator, "Operands must be numbers.");
+    throw new RuntimeError("Operands must be numbers.", operator);
   }
 
   private checkDivideByZero(operator: Token, secondOperand: Object) {
     if (typeof secondOperand === "number" && secondOperand !== 0) return;
-    throw new RuntimeError(operator, "Cannot divide by zero");
+    throw new RuntimeError("Cannot divide by zero", operator);
   }
 
   /**
@@ -215,7 +215,7 @@ export class Interpreter {
         if (typeof left === "string" && typeof right === "string") {
           return (left + right) as string;
         }
-        throw new RuntimeError(expr.operator, "Operands must be two numbers or two strings.");
+        throw new RuntimeError("Operands must be two numbers or two strings.", expr.operator);
       case TokenType.SLASH:
         this.checkNumberOperands(expr.operator, left, right);
         this.checkDivideByZero(expr.operator, right);

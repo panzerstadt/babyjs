@@ -45,7 +45,7 @@ export class Environment {
     const prevValue = this.values.get(name);
     if (!!prevValue) {
       if (this.strict) {
-        throw new RuntimeError(token, `Variable has already been defined.`);
+        throw new RuntimeError(`Variable has already been defined.`, token);
       }
       this.logger.info?.(
         `
@@ -77,7 +77,7 @@ e.g: let my_variable = "one"; ---> my_variable = "two";
 
     if (this.enclosing !== null) return this.enclosing.assign(name, value);
 
-    throw new RuntimeError(name, `Undefined variable '${name.lexeme}`);
+    throw new RuntimeError(`Undefined variable '${name.lexeme}`, name);
   }
 
   get(name: Token): Object {
@@ -85,13 +85,13 @@ e.g: let my_variable = "one"; ---> my_variable = "two";
       this.debug && this.printEnvironment(this.get.name);
       const value = this.values.get(name.lexeme)!;
       if (!value || value === NULL_LITERAL) {
-        throw new RuntimeError(name, `Unassigned variable '${name.lexeme}'`);
+        throw new RuntimeError(`Unassigned variable '${name.lexeme}' value?:${value}`, name);
       }
       return value;
     }
 
     if (this.enclosing !== null) return this.enclosing.get(name);
 
-    throw new RuntimeError(name, `Undefined variable '${name.lexeme}'.`);
+    throw new RuntimeError(`Undefined variable '${name.lexeme}'.`, name);
   }
 }
