@@ -212,6 +212,30 @@ describe("babyjs", () => {
     });
   });
 
+  describe("while", () => {
+    it("works", () => {
+      const code = `let a = 5; while (a > 0) { a = a - 1; print a; }`;
+      babyjs.runOnce(code);
+
+      expect(logger.error).not.toHaveBeenCalled();
+      expect(logger.log).toHaveBeenLastCalledWith(">>", 0);
+    });
+    it("works without curly brackets", () => {
+      const code = `let a = 5; while (a > 0) a = a - 1; print a;`;
+      babyjs.runOnce(code);
+
+      expect(logger.error).not.toHaveBeenCalled();
+      expect(logger.log).toHaveBeenLastCalledWith(">>", 0);
+    });
+    it("catches infinite loops", () => {
+      const code = `while (true) { }`;
+      babyjs.runOnce(code);
+
+      expect(logger.error).toHaveBeenCalledWith(expect.stringContaining("Infinite loop detected"));
+      expect(logger.log).not.toHaveBeenCalled();
+    });
+  });
+
   describe("logical operators", () => {
     describe("and", () => {
       it("true left expression also evaluates right expression", () => {

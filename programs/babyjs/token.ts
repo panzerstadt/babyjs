@@ -41,6 +41,7 @@ export const keywords = {
   nil: TokenType.NIL,
   and: TokenType.AND,
   or: TokenType.OR,
+  while: TokenType.WHILE,
 } as const;
 
 export const accidentalKeywords = {

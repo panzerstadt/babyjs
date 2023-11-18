@@ -8,6 +8,7 @@ import { PrintStyle, printAST } from "./pprinter";
 import { isTruthy } from "../constants";
 
 export class Interpreter {
+  private loop_upper_bound = 10_000;
   private environment = new Environment();
   logger: Console | LoggerType = console;
 
@@ -40,6 +41,8 @@ export class Interpreter {
         return this.visitExpressionStmt(stmt, debug);
       case "if":
         return this.visitIfStmt(stmt, debug);
+      case "while":
+        return this.visitWhileStmt(stmt, debug);
       case "print":
         return this.visitPrintStmt(stmt, debug);
       case "let":
@@ -269,6 +272,20 @@ export class Interpreter {
       this.execute(stmt.thenBranch);
     } else if (!!stmt.elseBranch) {
       this.execute(stmt.elseBranch);
+    }
+    return null;
+  }
+
+  public visitWhileStmt(stmt: Stmt["While"], debug?: boolean) {
+    debug && this._debugStatement(stmt);
+    let count = 0;
+
+    while (this.isTruthy(this.evaluate(stmt.condition))) {
+      if (count > this.loop_upper_bound) {
+        throw new RuntimeError(`Infinite loop detected at '${stmt.type}': ${stmt.condition}`);
+      }
+      this.execute(stmt.body);
+      count++;
     }
     return null;
   }

@@ -36,9 +36,11 @@ declaration    → varDecl // variables for now, functions and classes later
 statement      → exprStmt
                | ifStmt
                | printStmt
+               | whileStmt
                | block ;
 
 exprStmt       → expression ";" ;
+whileStmt      → "while" "(" expression ")" statement ;
 ifStmt         → "if" "(" expression ")" statement
                  ( "else" statement )? ;
 printStmt      → "print" expression ";" ;   
@@ -335,6 +337,15 @@ export class Parser {
     }
   }
 
+  private whileStatement() {
+    this.consume(TokenType.LEFT_PAREN, "Expect '(' after 'while'");
+    const condition = this.expression();
+    this.consume(TokenType.RIGHT_PAREN, "Expect ')' after 'while' condition");
+    const body = this.statement();
+
+    return Stmt.While(condition, body);
+  }
+
   private ifStatement() {
     this.consume(TokenType.LEFT_PAREN, "Expect '(' after 'if'");
     const condition = this.expression();
@@ -389,6 +400,7 @@ export class Parser {
   private statement(): AnyStmt {
     if (this.match(TokenType.IF)) return this.ifStatement();
     if (this.match(TokenType.PRINT)) return this.printStatement();
+    if (this.match(TokenType.WHILE)) return this.whileStatement();
     if (this.match(TokenType.LEFT_BRACE)) return Stmt.Block(this.block());
 
     return this.expressionStatement();

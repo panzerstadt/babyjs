@@ -10,6 +10,16 @@ const expression = (expression: AnyExpr): Expression => {
   return { type: "expression", expression };
 };
 
+interface While {
+  readonly type: "while";
+  readonly condition: AnyExpr;
+  readonly body: AnyStmt;
+}
+
+const whileexpr = (condition: AnyExpr, body: AnyStmt): While => {
+  return { type: "while", condition, body };
+};
+
 interface If {
   readonly type: "if";
   readonly condition: AnyExpr;
@@ -49,9 +59,10 @@ const blockStmt = (statements: AnyStmt[]): Block => {
   return { type: "block", statements };
 };
 
-export type AnyStmt = Expression | If | Print | Let | Block;
+export type AnyStmt = Expression | If | Print | Let | Block | While;
 export interface Stmt {
   Expression: Expression;
+  While: While;
   If: If;
   Print: Print;
   Let: Let;
@@ -59,6 +70,7 @@ export interface Stmt {
 }
 export const Stmt = {
   Expression: expression,
+  While: whileexpr,
   If: ifexpr,
   Print: print,
   Let: letStmt,
