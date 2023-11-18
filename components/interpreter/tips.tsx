@@ -19,7 +19,6 @@ export const Tips = () => {
     <ul className="select-none">
       {TIPS.map((t, i) => {
         const opacity = GRADIENT[i] || GRADIENT[GRADIENT.length - 1];
-        console.log(opacity);
 
         return (
           <li
