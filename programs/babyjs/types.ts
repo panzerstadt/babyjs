@@ -44,7 +44,6 @@ export enum TokenType {
   LESS_EQUAL = "LESS_EQUAL",
   FALSE = "FALSE",
   TRUE = "TRUE",
-  NIL = "NIL",
   CLASS = "CLASS",
   FUNC = "FUNC",
   LET = "LET", // because i'm offended by var

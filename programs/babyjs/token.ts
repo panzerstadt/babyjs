@@ -38,7 +38,6 @@ export const keywords = {
 
   false: TokenType.FALSE,
   true: TokenType.TRUE,
-  nil: TokenType.NIL,
   and: TokenType.AND,
   or: TokenType.OR,
   while: TokenType.WHILE,
@@ -46,9 +45,9 @@ export const keywords = {
 } as const;
 
 export const accidentalKeywords = {
-  null: "Did you mean 'nil'? This isn't Javascript you know...",
+  null: "You're trying to use a Javascript 'null'. in BabyJS the concept of 'null' has been banned. try setting a sensible default value instead.",
 } as const;
 
-export const NULL_LITERAL = "nil";
+export const _UNINITIALIZED = Symbol("uninitialized"); // sentinel value
 
 export type Keywords = Partial<keyof typeof keywords | keyof typeof accidentalKeywords>;

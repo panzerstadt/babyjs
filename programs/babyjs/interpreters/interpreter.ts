@@ -2,7 +2,7 @@ import { Environment } from "../environment";
 import { RuntimeError } from "../errors";
 import { AnyExpr, Expr } from "../constructs/expressions";
 import { AnyStmt, Stmt } from "../constructs/statements";
-import { NULL_LITERAL, Token } from "../token";
+import { Token, _UNINITIALIZED } from "../token";
 import { LoggerType, TokenType, assertNever } from "../types";
 import { PrintStyle, printAST } from "./pprinter";
 import { isTruthy } from "../constants";
@@ -324,7 +324,7 @@ export class Interpreter {
   public visitLetStmt(stmt: Stmt["Let"], debug?: boolean): void {
     debug && this._debugStatement(stmt);
 
-    let value = NULL_LITERAL as Object;
+    let value: Object = _UNINITIALIZED;
     if (stmt.initializer !== null) {
       value = this.evaluate(stmt.initializer);
     }
