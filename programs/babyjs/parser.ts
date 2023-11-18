@@ -42,7 +42,7 @@ statement      → exprStmt
 
 exprStmt       → expression ";" ;
 forStmt        → "for" "(" (varDecl | exprStmt | ";"" ) expression? ";" expression? ")" statement  // for loops are considered syntactic sugar, since you can actually do what for loops to with pieces of other statements
-               | "for" "[" expression ".." expression "]" statement
+               | "for" "(" varDecl "in" expression ( ".." | "..=" ) expression ")" statement
 whileStmt      → "while" "(" expression ")" statement ;
 ifStmt         → "if" "(" expression ")" statement
                  ( "else" statement )? ;

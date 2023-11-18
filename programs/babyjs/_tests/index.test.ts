@@ -338,6 +338,24 @@ describe("babyjs", () => {
       expect(logger.log).toHaveBeenCalledTimes(10);
       expect(logger.log).toHaveBeenLastCalledWith(">>", "GOAL");
     });
+
+    // https://doc.rust-lang.org/reference/expressions/range-expr.html
+    it("works using rust-style range expression (RangeExpr): start..end (start ≤ x < end)", () => {
+      const code = `for (i in 0..10) { print i; }`;
+      babyjs.runOnce(code);
+
+      expect(logger.error).not.toHaveBeenCalled();
+      expect(logger.log).toHaveBeenCalledTimes(10);
+      expect(logger.log).toHaveBeenLastCalledWith(">>", 9);
+    });
+    it("works using rust-style range expression (RangeInclusiveExpr): start..=end (start ≤ x ≤ end)", () => {
+      const code = `for (i in 0..=10) { print i; }`;
+      babyjs.runOnce(code);
+
+      expect(logger.error).not.toHaveBeenCalled();
+      expect(logger.log).toHaveBeenCalledTimes(10);
+      expect(logger.log).toHaveBeenLastCalledWith(">>", 10);
+    });
   });
 
   describe("logical operators", () => {
