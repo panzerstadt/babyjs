@@ -251,6 +251,18 @@ describe("babyjs", () => {
         expect.stringContaining("Expected an operand before '=='")
       );
     });
+
+    describe("misleading errors", () => {
+      it("(trying to assign a reserved word) should not show binary operator error for unrelated errors", () => {
+        const code = "let one = for;";
+        babyjs.runOnce(code);
+
+        expect(logger.log).not.toHaveBeenCalled();
+        expect(logger.error).not.toHaveBeenCalledWith(
+          expect.stringContaining("Expected an operand before")
+        );
+      });
+    });
   });
 
   describe("if else", () => {
