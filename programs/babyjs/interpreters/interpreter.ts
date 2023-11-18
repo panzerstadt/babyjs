@@ -7,6 +7,16 @@ import { LoggerType, TokenType, assertNever } from "../types";
 import { PrintStyle, printAST } from "./pprinter";
 import { isTruthy } from "../constants";
 
+const statementIsVariableExpression = (
+  statements: AnyStmt[]
+): statements is Stmt["Expression"][] => {
+  return (
+    statements.length === 1 &&
+    statements[0].type === "expression" &&
+    statements[0].expression.type === "variable"
+  );
+};
+
 export class Interpreter {
   private loop_upper_bound = 10_000;
   private environment = new Environment();
@@ -20,7 +30,7 @@ export class Interpreter {
   public interpret(statements: AnyStmt[], debug?: boolean): RuntimeError | undefined {
     this.environment.setDebug(debug);
     try {
-      if (statements.length === 1 && statements[0].type === "expression") {
+      if (statementIsVariableExpression(statements)) {
         const statement = statements[0];
         this.visitPrintStmt({ type: "print", expression: statement.expression }, debug);
         return;
