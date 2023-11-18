@@ -17,6 +17,13 @@ export class Program {
     return Date.now();
   }
 
+  private to_stdout(str: string) {
+    this.stdout += str
+      .split("\n")
+      .map((s) => `${this.timestamp()}:${s}\n`)
+      .join("");
+  }
+
   output(): LoggerType {
     return {
       log: (...strs: string[]) => {
@@ -47,11 +54,11 @@ export class Program {
   input(code: string) {
     if (code === "vvvv") {
       this.verbose = !this.verbose;
-      this.stdout = this.verbose ? "i'll more verbose." : "i'll be less verbose.";
+      this.to_stdout(this.verbose ? "i'll more verbose." : "i'll be less verbose.");
       return;
     }
     if (code === "help") {
-      this.stdout = `${this.help()}`;
+      this.to_stdout(this.help());
       return;
     }
 
@@ -119,10 +126,6 @@ help  :  this message.
 clear :  clears the terminal.
 vvvv  :  toggles verbose mode. explore the innards of how a program
          gets understood by the interpreter!
-    `
-
-      .split("\n")
-      .map((s) => `${this.timestamp()}:${s}\n`)
-      .join("");
+    `;
   }
 }
