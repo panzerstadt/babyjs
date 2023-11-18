@@ -50,6 +50,8 @@ export class Interpreter {
         return this.visitBlockStmt(stmt, debug);
       default:
         assertNever(stmt);
+        // @ts-expect-error
+        throw new Error(`NOT IMPLEMENTED: statement '${stmt?.type}' needs to be implemented`);
     }
 
     // unreachable
