@@ -14,7 +14,8 @@ export const useStd = (
   ref: MutableRefObject<Program | undefined>,
   stdType: "out" | "err" | "info",
   setLines: Dispatch<SetStateAction<Line[]>>,
-  onLineOut?: () => void
+  onLineOut?: () => void,
+  immediate?: boolean
 ) => {
   const queue = useQueue<Line>();
   const currentRef = ref.current?.[`std${stdType}`];
@@ -38,16 +39,19 @@ export const useStd = (
     let interval: ReturnType<typeof setInterval>;
     // queue size changed, check for stuff in queue
     if (queue.size > 0) {
-      interval = setInterval(() => {
-        const item = queue.deque();
+      interval = setInterval(
+        () => {
+          const item = queue.deque();
 
-        if (!item) {
-          return clearInterval(interval);
-        }
+          if (!item) {
+            return clearInterval(interval);
+          }
 
-        setLines((p) => [...p, item!]);
-        onLineOut?.();
-      }, TERMINAL_SPEED_MS);
+          setLines((p) => [...p, item!]);
+          onLineOut?.();
+        },
+        immediate ? 0 : TERMINAL_SPEED_MS
+      );
     }
 
     return () => {

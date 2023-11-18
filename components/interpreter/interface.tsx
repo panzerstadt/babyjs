@@ -26,7 +26,7 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
     program.current = new Program();
   }, []);
   useStd(program, "out", setLines, () => scrollToBottom());
-  useStd(program, "err", setLines, () => scrollToBottom());
+  useStd(program, "err", setLines, () => scrollToBottom(), true);
   useStd(program, "info", setLines, () => scrollToBottom());
 
   const [userHistory, { back, forward, add }] = useHistory();
