@@ -212,7 +212,7 @@ describe("babyjs", () => {
     });
   });
 
-  describe("while", () => {
+  describe("while loop", () => {
     it("works", () => {
       const code = `let a = 5; while (a > 0) { a = a - 1; print a; }`;
       babyjs.runOnce(code);
