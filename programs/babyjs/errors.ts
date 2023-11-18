@@ -41,7 +41,7 @@ ${pointToErrorAt(col, line, multiline)}
   }
 
   printErrors() {
-    this.logger.error("Errors found when scanning the file.");
+    this.logger.error("SCAN ERROR: Errors found when lexing the file.");
     this.logger.error("----------------START------------------");
     this.errors.forEach((e) => {
       this.logger.error(e);
@@ -90,7 +90,7 @@ export class ParseError {
 
   error(token: Token, message: string) {
     if (token.type === TokenType.EOF) {
-      this.report(token.line, " at end", message);
+      this.report(token.line, " at end of file", message);
     } else {
       this.report(token.line, ` at '${token.lexeme}'`, message);
     }
@@ -105,7 +105,7 @@ export class ParseError {
   }
 
   printErrors() {
-    this.logger.error("Errors found when parsing the file.");
+    this.logger.error("PARSE ERROR: Errors found when parsing scanned tokens from the file.");
     this.logger.error("----------------START------------------");
     this.errors.forEach((e) => {
       this.logger.error(e);
@@ -119,7 +119,7 @@ export class RuntimeError extends Error {
   readonly token?: Token;
 
   constructor(message: string, token?: Token) {
-    super(message);
+    super(`RUNTIME ERROR: ${message}`);
     this.token = token;
   }
 }
