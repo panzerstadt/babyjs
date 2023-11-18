@@ -236,6 +236,17 @@ describe("babyjs", () => {
     });
   });
 
+  describe("for loop", () => {
+    it("works", () => {
+      const code = `for (let a = 0;a < 10;a=a+1) { print "GOAL"; }`;
+      babyjs.runOnce(code);
+
+      expect(logger.error).not.toHaveBeenCalled();
+      expect(logger.log).toHaveBeenCalledTimes(10);
+      expect(logger.log).toHaveBeenLastCalledWith(">>", "GOAL");
+    });
+  });
+
   describe("logical operators", () => {
     describe("and", () => {
       it("true left expression also evaluates right expression", () => {

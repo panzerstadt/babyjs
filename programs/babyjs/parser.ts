@@ -340,8 +340,16 @@ export class Parser {
     }
   }
 
-  // 'desugaring', or turning syntactic sugar into its underlying implementation
-  // since for loops can be made up of other statments, we can 'desugar' it
+  /**
+   * 'desugaring', or turning syntactic sugar into its underlying implementation
+   * since for loops can be made up of other statments, we can 'desugar' it
+   *
+      var i = 0; -> initializer part of the 'for' clause
+      while (i < 10) { -> condition part of the 'for' clause
+        print i; -> statement inside the body
+        i = i + 1; -> increment part of the 'for' clause
+      }
+   */
   private forStatement() {
     this.consume(TokenType.LEFT_PAREN, "Expect  '(' after  'for'.");
 
@@ -372,6 +380,26 @@ export class Parser {
 
     // for (let i = 0; i < len; i++) { <HERE> }
     let body = this.statement();
+
+    // for (let i = 0; i < len; <HERE>) { ... }
+    // if incr is defined, eval the body, and then eval incr
+    if (increment !== null) {
+      body = Stmt.Block([body, Stmt.Expression(increment)]);
+    }
+
+    // for (let i = 0; <HERE>; i++) { ... }
+    // if condition is not defined, just keep going
+    if (condition === null) {
+      condition = Expr.Literal(true);
+    }
+    body = Stmt.While(condition, body);
+
+    // for (<HERE>; i < len; i++) { ... }
+    // if init exists, runs initializer before the entire loop
+    if (initializer !== null) {
+      body = Stmt.Block([initializer, body]);
+    }
+
     return body;
   }
 
