@@ -5,6 +5,7 @@ import { AnyStmt, Stmt } from "../constructs/statements";
 import { NULL_LITERAL, Token } from "../token";
 import { LoggerType, TokenType, assertNever } from "../types";
 import { PrintStyle, printAST } from "./pprinter";
+import { isTruthy } from "../constants";
 
 export class Interpreter {
   private environment = new Environment();
@@ -99,11 +100,7 @@ export class Interpreter {
 
   // https://chat.openai.com/share/ba09a5f7-a8a4-4401-aa24-898c91c89d40
   private isTruthy(object: Object): boolean {
-    if (object === NULL_LITERAL) return false;
-    if (object === null) return false;
-    if (object === undefined) return false;
-    if (typeof object === "boolean") return Boolean(object);
-    return true;
+    return isTruthy(object);
   }
 
   private isEqual(a: Object, b: Object): boolean {

@@ -1,3 +1,4 @@
+import { isTruthy } from "./constants";
 import { RuntimeError } from "./errors";
 import { NULL_LITERAL, Token } from "./token";
 import { LoggerType } from "./types";
@@ -84,7 +85,7 @@ e.g: let my_variable = "one"; ---> my_variable = "two";
     if (this.values.has(name.lexeme)) {
       this.debug && this.printEnvironment(this.get.name);
       const value = this.values.get(name.lexeme)!;
-      if (!value || value === NULL_LITERAL) {
+      if (!isTruthy(value) || value === NULL_LITERAL) {
         throw new RuntimeError(`Unassigned variable '${name.lexeme}' value?:${value}`, name);
       }
       return value;
