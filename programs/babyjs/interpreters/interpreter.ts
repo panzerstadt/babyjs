@@ -99,12 +99,10 @@ export class Interpreter {
 
   // https://chat.openai.com/share/ba09a5f7-a8a4-4401-aa24-898c91c89d40
   private isTruthy(object: Object): boolean {
-    console.log("what is object", object);
     if (object === NULL_LITERAL) return false;
     if (object === null) return false;
     if (object === undefined) return false;
     if (typeof object === "boolean") return Boolean(object);
-    console.log("i think goal is true", object);
     return true;
   }
 
