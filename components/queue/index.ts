@@ -10,7 +10,6 @@ export class Queue<T> {
   public size = 0;
 
   private can_enqueue() {
-    console.log("size", this.size);
     if (this.size > MAX_BUFFER_SIZE) {
       console.warn(
         `max buffer reached (${this.size}/${MAX_BUFFER_SIZE}): messages will be dropped.`
