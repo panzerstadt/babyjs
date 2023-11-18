@@ -44,6 +44,17 @@ export class Interpreter {
     }
   }
 
+  /**
+   * special cases:
+   * - "for": a little special. its syntactic sugar, so no interpreter impl.
+   *          instead it 'desugars' it into a while loop, sorta like:
+   *          var i = 0; -> initializer part of the 'for' clause
+   *          while (i < 10) { -> condition part of the 'for' clause
+   *            print i; -> statement inside the body
+   *            i = i + 1; -> increment part of the 'for' clause
+   *          }
+   * -
+   */
   private execute(stmt: AnyStmt, debug?: boolean) {
     switch (stmt.type) {
       case "expression":
