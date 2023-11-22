@@ -59,7 +59,26 @@ const blockStmt = (statements: AnyStmt[]): Block => {
   return { type: "block", statements };
 };
 
-export type AnyStmt = Expression | If | Print | Let | Block | While;
+interface RangeFor {
+  readonly type: "rangeFor";
+  readonly initializerName: Token; // for (<here> in 0..5) { ... }
+  readonly start: AnyExpr; // for (i in <here>..5) { ... }
+  readonly end: AnyExpr; // for (i in 0..<here>) { ... }
+  readonly inclusive: boolean;
+  readonly body: AnyStmt;
+}
+
+const rangeFor = (
+  initializerName: Token,
+  start: AnyExpr,
+  end: AnyExpr,
+  inclusive: boolean,
+  body: AnyStmt
+): RangeFor => {
+  return { type: "rangeFor", initializerName, start, end, inclusive, body };
+};
+
+export type AnyStmt = Expression | If | Print | Let | Block | While | RangeFor;
 export interface Stmt {
   Expression: Expression;
   While: While;
@@ -67,6 +86,7 @@ export interface Stmt {
   Print: Print;
   Let: Let;
   Block: Block;
+  RangeFor: RangeFor;
 }
 export const Stmt = {
   Expression: expression,
@@ -75,4 +95,5 @@ export const Stmt = {
   Print: print,
   Let: letStmt,
   Block: blockStmt,
+  RangeFor: rangeFor,
 };

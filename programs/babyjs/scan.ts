@@ -81,7 +81,7 @@ export class Scanner {
         this.addToken(TokenType.COMMA);
         break;
       case ".":
-        this.addToken(TokenType.DOT);
+        this.addToken(this.match(".") ? TokenType.DOT_DOT : TokenType.DOT);
         break;
       case "-":
         this.addToken(TokenType.MINUS);

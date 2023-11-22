@@ -62,6 +62,10 @@ export enum TokenType {
   // THIS,
 
   EOF = "EOF",
+
+  // rust for loops
+  IN = "IN",
+  DOT_DOT = "DOT_DOT",
 }
 
 export interface LoggerType {

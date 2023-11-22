@@ -346,15 +346,57 @@ describe("babyjs", () => {
 
       expect(logger.error).not.toHaveBeenCalled();
       expect(logger.log).toHaveBeenCalledTimes(10);
-      expect(logger.log).toHaveBeenLastCalledWith(">>", 9);
+
+    describe("rusty for loops (rangeFor)", () => {
+      it("works using rust-style range expression (RangeExpr): start..end (start ≤ x < end)", () => {
+        const code = `for (i in 0..10) { print i; }`;
+        babyjs.runOnce(code);
+
+        expect(logger.error).not.toHaveBeenCalled();
+        expect(logger.log).toHaveBeenCalledTimes(10);
+        expect(logger.log).toHaveBeenLastCalledWith(">>", 9);
     });
     it("works using rust-style range expression (RangeInclusiveExpr): start..=end (start ≤ x ≤ end)", () => {
       const code = `for (i in 0..=10) { print i; }`;
       babyjs.runOnce(code);
 
       expect(logger.error).not.toHaveBeenCalled();
-      expect(logger.log).toHaveBeenCalledTimes(10);
+        expect(logger.log).toHaveBeenCalledTimes(11);
       expect(logger.log).toHaveBeenLastCalledWith(">>", 10);
+      });
+      it("variables can be used for start and end", () => {
+        const code = `let start = 0; let end = 10; for (i in start..end) { print i; }`;
+        babyjs.runOnce(code);
+
+        expect(logger.error).not.toHaveBeenCalled();
+        expect(logger.log).toHaveBeenCalledTimes(10);
+        expect(logger.log).toHaveBeenLastCalledWith(">>", 9);
+      });
+      it("works when you do another for loop with the same initializer (block scoping initializer declaration)", () => {
+        const code = `for (i in 0..10) { print i; } for (i in 0..10) { print i; }`;
+        babyjs.runOnce(code);
+
+        expect(logger.error).not.toHaveBeenCalled();
+        expect(logger.log).toHaveBeenCalledTimes(20);
+        expect(logger.log).toHaveBeenLastCalledWith(">>", 9);
+      });
+      it("complex expressions work for start and end", () => {
+        const code = `let start = 4/2 -2; for (i in start..5*2) { print i; }`;
+        babyjs.runOnce(code);
+
+        expect(logger.error).not.toHaveBeenCalled();
+        expect(logger.log).toHaveBeenCalledTimes(10);
+        expect(logger.log).toHaveBeenLastCalledWith(">>", 9);
+      });
+      it("should error when start or end values do not evaluate to numbers", () => {
+        const code = `let start = "foo"; for (i in start..10) { print i; }`;
+        babyjs.runOnce(code);
+
+        expect(logger.error).toHaveBeenCalledWith(
+          expect.stringContaining("must evaluate to numbers")
+        );
+        expect(logger.log).not.toHaveBeenCalled();
+      });
     });
   });
 

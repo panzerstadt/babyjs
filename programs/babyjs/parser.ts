@@ -339,6 +339,42 @@ export class Parser {
     }
   }
 
+  private forStatement() {
+    this.consume(TokenType.LEFT_PAREN, "Expect  '(' after  'for'.");
+
+    if (this.check(TokenType.IDENTIFIER)) {
+      return this.rangeForStatement();
+    } else {
+      return this.cForStatement();
+    }
+  }
+
+  /**
+   * https://doc.rust-lang.org/reference/expressions/range-expr.html
+   * for (i in 0..5) { ... }
+   */
+  private rangeForStatement() {
+    // for (<here> in 0..5) { ... }
+    const name = this.consume(TokenType.IDENTIFIER, "Expect variable name in 'for' loop");
+    // for (i <here> 0..5) { ... }
+    this.consume(TokenType.IN, "Expect 'in' in 'for' clause.");
+    // for (i in <here>..5) { ... }
+    const start = this.expression();
+    // for (i in 0<here>5) { ... }
+    this.consume(TokenType.DOT_DOT, "Expect '..' in range expression of 'for' loop");
+    // for (i in 0..(=)?5) { ... } --> optionally inclusive range
+    let inclusive = false;
+    if (this.match(TokenType.EQUAL)) {
+      inclusive = true;
+    }
+    // for (i in 0..<here>) { ... }
+    const end = this.expression();
+    this.consume(TokenType.RIGHT_PAREN, "Expect ')' after 'for' clauses");
+    const body = this.statement();
+
+    return Stmt.Block([Stmt.RangeFor(name, start, end, inclusive, body)]);
+  }
+
   /**
    * 'desugaring', or turning syntactic sugar into its underlying implementation
    * since for loops can be made up of other statments, we can 'desugar' it
@@ -349,8 +385,8 @@ export class Parser {
         i = i + 1; -> increment part of the 'for' clause
       }
    */
-  private forStatement() {
-    this.consume(TokenType.LEFT_PAREN, "Expect  '(' after  'for'.");
+  private cForStatement() {
+    // this.consume(TokenType.LEFT_PAREN, "Expect  '(' after  'for'.");
 
     // for (<HERE>; i < len; i++) { ... }
     let initializer;

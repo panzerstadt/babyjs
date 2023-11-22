@@ -69,6 +69,8 @@ export class Interpreter {
         return this.visitLetStmt(stmt, debug);
       case "block":
         return this.visitBlockStmt(stmt, debug);
+      case "rangeFor":
+        return this.visitRangeForStmt(stmt, debug);
       default:
         assertNever(stmt);
         // @ts-expect-error
@@ -308,6 +310,26 @@ export class Interpreter {
       }
       this.execute(stmt.body);
       count++;
+    }
+    return null;
+  }
+
+  public visitRangeForStmt(stmt: Stmt["RangeFor"], debug?: boolean) {
+    debug && this._debugStatement(stmt);
+
+    const startValue = this.evaluate(stmt.start);
+    const endValue = this.evaluate(stmt.end);
+    if (typeof startValue !== "number" || typeof endValue !== "number" || endValue === Infinity) {
+      throw new RuntimeError(
+        `Start and End values of for loop must evaluate to numbers. start:"${startValue}" end:"${endValue}"`
+      );
+    }
+    // for (<here> in 0..5) { ... }
+    this.environment.define(stmt.initializerName.lexeme, startValue, stmt.initializerName);
+
+    for (let i = startValue; stmt.inclusive ? i <= endValue : i < endValue; i++) {
+      this.environment.assign(stmt.initializerName, i); // increments the value
+      this.execute(stmt.body);
     }
     return null;
   }

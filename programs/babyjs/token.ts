@@ -42,6 +42,7 @@ export const keywords = {
   or: TokenType.OR,
   while: TokenType.WHILE,
   for: TokenType.FOR,
+  in: TokenType.IN,
 } as const;
 
 export const accidentalKeywords = {
