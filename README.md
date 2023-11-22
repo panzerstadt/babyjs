@@ -8,6 +8,15 @@ As I'm most comfortable in Typescript + React + Nextjs, and the focus is on mull
 
 BabyJS is also integrated into my [blog site](https://prng-v3.vercel.app/) with the hopes that I could find a way to turn it into my search interface in the near future.
 
+## wishlist
+
+- in functions, can i haz a: `array.swapIndex(idxOne, idxTwo)`
+- can i make it easier to clarify off-by-one issues?
+  - maybe in functions, descriptions indicate whether its inclusive or exclusive?
+    - also explain what inclusive and exclusive means?
+- an we always create a function graph during interpretation, so that when an error stack happens, we show the graph?
+- in recursive functions, can we have a visualization? just boxes pointing to other boxes (linkedlist-like)
+
 ## NextJS setup
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
