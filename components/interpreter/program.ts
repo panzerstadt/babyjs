@@ -29,6 +29,8 @@ export class Program {
     return {
       log: (...strs: string[]) => {
         this.stdout += strs
+          .map((s) => s.toString())
+          .map((s) => s.split("\n"))
           .flat(5)
           .map((s) => `${this.timestamp()}:${s}\n`)
           .join("");
@@ -117,12 +119,22 @@ if (also)
   print "but they're syntactic sugar";
   if (1 + 1 == 2)
     print "and you don't really need them";
-  else if (2 + 2 = 4)
+  else if (2 + 2 == 4)
     print "but it might feel a bit weird";
   else
     print "but to each their own";
 else
   print "also, the above white space doesn't matter";
+
+// fibonacci
+let a = 0;
+let temp;
+
+for (let b = 1; a < 10000; b = temp + b) {
+  print a;
+  temp = a;
+  a = b;
+}
 
 
 // come back from time to time to see this list grow!
