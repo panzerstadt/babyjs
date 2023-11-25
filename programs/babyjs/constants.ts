@@ -28,6 +28,7 @@ export const isTruthy = (object?: Object | null): boolean => {
 export const canDeclareWithValue = (object: unknown): boolean => {
   if (object === undefined) return false;
   if (object === null) return false;
+  if (object === _EMPTY_FN_RETURN) return false;
 
   if (object === _UNINITIALIZED) return true;
   return true;

@@ -1,6 +1,6 @@
 import { canDeclareWithValue, isValidUserValue, isValueUninitialized } from "./constants";
 import { RuntimeError } from "./errors";
-import { Token, _UNINITIALIZED } from "./token";
+import { Token, _EMPTY_FN_RETURN, _UNINITIALIZED } from "./token";
 import { LoggerType } from "./types";
 
 /**
@@ -50,7 +50,19 @@ export class Environment {
    * - declare variable without assignment
    * - declare variable with assignment of valid value
    */
-  define(name: string, value: Object | typeof _UNINITIALIZED, token?: Token) {
+  define(
+    name: string,
+    value: Object | typeof _UNINITIALIZED | typeof _EMPTY_FN_RETURN,
+    token?: Token
+  ) {
+    if (value === _EMPTY_FN_RETURN) {
+      throw new RuntimeError(
+        `You may be assigning a function with no return values to a variable. This is not allowed.`,
+        token
+      );
+      return;
+    }
+
     const hasBeenDeclared = this.values.has(name);
 
     if (this.strict && hasBeenDeclared) {
@@ -93,8 +105,18 @@ e.g: let my_variable = "one"; ---> my_variable = "two";
    * there are two modes of assignment: init and reassign
    */
   assign(name: Token, value: Object): void {
+    if (value === _EMPTY_FN_RETURN) {
+      throw new RuntimeError(
+        `You may be assigning a function with no return values to a variable. This is not allowed.`,
+        name
+      );
+      return;
+    }
     // 1. initializes the variable
     if (isValueUninitialized(this.values.get(name.lexeme))) {
+      if (!isValidUserValue(value)) {
+        throw new RuntimeError(`${value} cannot be assigned to ${name.lexeme}`);
+      }
       this.values.set(name.lexeme, value);
       return;
     }

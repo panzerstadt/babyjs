@@ -764,5 +764,31 @@ describe("babyjs", () => {
         expect(logger.log).not.toHaveBeenCalled();
       });
     });
+
+    it("assigns return values form functions", () => {
+      const code = `fn yes() { return 1; } let one = yes(); print one;`;
+      babyjs.runOnce(code);
+
+      expect(logger.error).not.toHaveBeenCalled();
+      expect(logger.log).toHaveBeenCalledWith(">>", 1);
+    });
+    it("return values can be part of expressions", () => {
+      const code = `fn yes() { return 1; } let three = yes() + 2; print three;`;
+      babyjs.runOnce(code);
+
+      expect(logger.error).not.toHaveBeenCalled();
+      expect(logger.log).toHaveBeenCalledWith(">>", 3);
+    });
+    it("does not allow assignment of functions that don't return values", () => {
+      const code = `fn no() { 1 + 1; } let one = no(); print one;`;
+
+      babyjs.runOnce(code);
+
+      expect(logger.error).toHaveBeenCalledWith(
+        "interpret",
+        expect.stringContaining("assigning a function with no return values to a variable")
+      );
+      expect(logger.log).not.toHaveBeenCalled();
+    });
   });
 });

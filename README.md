@@ -28,6 +28,17 @@ emailaddress = null; // you mean you don't know the emailaddress yet. -> uniniti
 
 // its not giving me back anything
 function() {}; // you mean your function is just side effects, you're not returning anything from the function to pass in
+
+function procedure() { print "don't return anything"; }
+var result = procedure(); // -> should throw error here
+print result;
+
+// TODO: what about functions with early returns?
+function(a) {
+  if (!a) return // we force the user to return something useful? (needs testing)
+
+  return a + 1
+}
 ```
 
 ## NextJS setup
