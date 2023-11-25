@@ -360,7 +360,7 @@ describe("babyjs", () => {
       expect(logger.log).toHaveBeenCalledTimes(11);
       expect(logger.log).toHaveBeenLastCalledWith(">>", 99);
     });
-    it("can do fibonacci", () => {
+    it("can do fibonacci (simple)", () => {
       const code = `let a = 0;
       let temp;
       
@@ -654,6 +654,16 @@ describe("babyjs", () => {
       expect(logger.error).not.toHaveBeenCalled();
       expect(logger.log).toHaveBeenLastCalledWith(">>", "Hi, Dear Reader!");
     });
+    it("does not execute functions if not called", () => {
+      const code = `fn bad() {
+        print 1 / 0;
+      }`;
+
+      babyjs.runOnce(code);
+
+      expect(logger.error).not.toHaveBeenCalled();
+      expect(logger.log).not.toHaveBeenCalled();
+    });
     it("prints uncalled functions properly", () => {
       const code = "fn myFunc() {} print myFunc;";
       babyjs.runOnce(code);
@@ -679,6 +689,70 @@ describe("babyjs", () => {
 
       expect(logger.error).not.toHaveBeenCalled();
       expect(logger.log).toHaveBeenLastCalledWith(">>", "<");
+    });
+    it("can do fibonacci (recursive function calls)", () => {
+      const code = `
+      fn fib(n) {
+        if (n <= 1) return n;
+        return fib(n - 2) + fib(n - 1);
+      }
+      
+      for (let i = 0; i < 15; i = i + 1) {
+        print fib(i);
+      }`;
+      babyjs.runOnce(code);
+
+      expect(logger.error).not.toHaveBeenCalled();
+      expect(logger.log).toHaveBeenLastCalledWith(">>", 377);
+    });
+
+    describe("return statements", () => {
+      it("works", () => {
+        const code = `fn myfunc() { return 1; } let one = myfunc(); print one;`;
+        babyjs.runOnce(code);
+
+        expect(logger.error).not.toHaveBeenCalled();
+        expect(logger.log).toHaveBeenLastCalledWith(">>", 1);
+      });
+      it("does not swallow runtime exceptions when return statement has errors", () => {
+        const code = `
+        fn test() {
+          return 1 / 0;
+        }
+
+        test();
+        `;
+
+        babyjs.runOnce(code);
+
+        expect(logger.error).toHaveBeenCalled();
+        expect(logger.error).toHaveBeenCalledWith(
+          "interpret",
+          expect.stringContaining("divide by zero")
+        );
+        expect(logger.log).not.toHaveBeenCalled();
+      });
+      it("does not swallow runtime exceptions when function body has errors", () => {
+        const code = `
+        fn test() {
+          if (1/0) print "wrong";
+
+          print "should not happen";
+          return 1;
+        }
+
+        test();
+        `;
+
+        babyjs.runOnce(code);
+
+        expect(logger.error).toHaveBeenCalled();
+        expect(logger.error).toHaveBeenCalledWith(
+          "interpret",
+          expect.stringContaining("divide by zero")
+        );
+        expect(logger.log).not.toHaveBeenCalled();
+      });
     });
   });
 });
