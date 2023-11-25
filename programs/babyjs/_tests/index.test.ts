@@ -85,6 +85,16 @@ describe("babyjs", () => {
 
       expect(logger.log).toHaveBeenCalledWith(">>", false);
     });
+    it("should not divide by zero", () => {
+      const code = `print 1 / 0;`;
+      babyjs.runOnce(code);
+
+      expect(logger.log).not.toHaveBeenCalled();
+      expect(logger.error).toHaveBeenCalledWith(
+        "interpret",
+        expect.stringContaining("divide by zero")
+      );
+    });
   });
 
   describe("let", () => {
