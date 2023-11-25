@@ -19,10 +19,17 @@ const statementIsVariableExpression = (
 
 export class Interpreter {
   private loop_upper_bound = 10_000;
-  private environment = new Environment();
+  readonly globals = new Environment();
+  private environment = this.globals;
   logger: Console | LoggerType = console;
 
-  setLogger(newLogger: LoggerType) {
+  constructor() {
+    // FFI (this is where we allow the users to work with files, read user input etc)
+    this.globals.define("clock", new Clock());
+    this.globals.define("ls", new Ls());
+  }
+
+  public setLogger(newLogger: LoggerType) {
     this.logger = newLogger;
     this.environment.setLogger(newLogger);
   }
