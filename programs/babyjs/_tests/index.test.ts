@@ -790,5 +790,28 @@ describe("babyjs", () => {
       );
       expect(logger.log).not.toHaveBeenCalled();
     });
+    it("allows mixing of returns with and without empty values", () => {
+      const code = `
+      fn early(num) {
+        if (num != 1) return;
+        return num;
+      }
+
+      // allowed
+      let one = early(1); 
+      print one;
+
+      // not allowed
+      let two = early(2);
+      print two;
+      `;
+      babyjs.runOnce(code);
+
+      expect(logger.log).toHaveBeenCalledWith(">>", 1); // still prints 1
+      expect(logger.error).toHaveBeenCalledWith(
+        "interpret",
+        expect.stringContaining("assigning a function with no return values to a variable")
+      );
+    });
   });
 });
