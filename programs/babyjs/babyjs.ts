@@ -19,7 +19,9 @@ export class BabyJs {
   }
 
   runtimeError(error: RuntimeError) {
-    this.logger.error("interpret",`[line ${error.token?.line}] token '${error.token?.lexeme}': ${error.message}`); // prettier-ignore
+    const token = error.token?.lexeme;
+    const line = error.token?.line || "unknown";
+    this.logger.error("interpret",`[line ${line}] ${token ? `token ${error.token?.lexeme}`: ""}: ${error.message}`); // prettier-ignore
     this.hadRuntimeError = true;
   }
 
