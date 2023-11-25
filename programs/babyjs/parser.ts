@@ -60,7 +60,7 @@ export class Parser {
   private tokens: Token[];
   private current: number;
   private _error: ParseError;
-  logger: Console | LoggerType = console;
+  logger: LoggerType = console;
 
   constructor(tokens: Token[]) {
     this.current = 0;
@@ -470,7 +470,7 @@ export class Parser {
   private expressionStatement() {
     const expr = this.expression();
     if (!expr) {
-      this.logger.log("could not parse expression!");
+      this.logger.error("parse", "could not parse expression!");
     }
     this.consume(TokenType.SEMICOLON, "Expect ';' after expression.");
     return Stmt.Expression(expr);
@@ -555,7 +555,11 @@ export class Parser {
       if (debug) {
         statements.forEach((stmt) => {
           // console.log("\nCONSOLE parse tree (json):\n", JSON.stringify(stmt, null, 4));
-          this.logger.log("parse tree (json):\n", ...JSON.stringify(stmt, null, 4).split("\n"));
+          this.logger.debug?.(
+            "parse",
+            "parse tree (json):\n",
+            ...JSON.stringify(stmt, null, 4).split("\n")
+          );
         });
       }
 

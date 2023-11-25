@@ -2,14 +2,14 @@ import { RuntimeError } from "./errors";
 import { Interpreter } from "./interpreters/interpreter";
 import { Parser } from "./parser";
 import { Scanner } from "./scan";
-import { LoggerType } from "./types";
+import { LoggerType, Phase } from "./types";
 // import prompt from "prompt-sync";
 const newPrompt = (prefix: string) => ""; // prompt()
 
 export class BabyJs {
   hadError = false;
   hadRuntimeError = false;
-  logger: Console | LoggerType = console;
+  logger: LoggerType = console;
 
   readonly interpreter = new Interpreter();
 
@@ -19,14 +19,27 @@ export class BabyJs {
   }
 
   runtimeError(error: RuntimeError) {
-    this.logger.error(`[line ${error.token?.line}] token '${error.token?.lexeme}': ${error.message}`); // prettier-ignore
+    this.logger.error("interpret",`[line ${error.token?.line}] token '${error.token?.lexeme}': ${error.message}`); // prettier-ignore
     this.hadRuntimeError = true;
   }
 
-  pprintStep(phase: string) {
-    this.logger.log("-----------------");
-    this.logger.log(phase + "...");
-    this.logger.log("-----------------");
+  _getPhase(str: string): Phase {
+    switch (str) {
+      case "Scanning":
+        return "scan";
+      case "Parsing":
+        return "parse";
+      case "Interpreting":
+        return "interpret";
+      default:
+        throw new Error("unknown phase");
+    }
+  }
+
+  debugPprintStep(phase: string) {
+    this.logger.debug?.(this._getPhase(phase), "-----------------");
+    this.logger.debug?.(this._getPhase(phase), phase + "...");
+    this.logger.debug?.(this._getPhase(phase), "-----------------");
   }
 
   runOnce(code: string | null, debug: boolean = false) {
@@ -41,7 +54,7 @@ export class BabyJs {
 
     // 1. scan text, turn them into tokens that the language recognizes
     //    token = lexeme + metadata
-    debug && this.pprintStep("Scanning");
+    debug && this.debugPprintStep("Scanning");
     const scanner = new Scanner(code);
     scanner.setLogger(this.logger);
     const tokens = scanner.scanTokens(debug);
@@ -49,7 +62,7 @@ export class BabyJs {
     if (scanner.hadError()) return this.nextLoop(debug, once);
 
     // 2. parse text into expressions, in the form of an AST
-    debug && this.pprintStep("Parsing");
+    debug && this.debugPprintStep("Parsing");
     const parser = new Parser(tokens);
     parser.setLogger(this.logger);
     const statements = parser.parse(debug);
@@ -59,7 +72,7 @@ export class BabyJs {
     // 3. interpret expression and show result
     //       interpreter can't be new every time because
     //       we want it to have memory across repls
-    debug && this.pprintStep("Interpreting");
+    debug && this.debugPprintStep("Interpreting");
     const error = this.interpreter.interpret(statements, debug);
     if (error) {
       console.error(error);

@@ -78,7 +78,7 @@ export class Interpreter {
     }
 
     // unreachable
-    this.logger.error(`reached unreachable code at '${this.evaluate.name}'!`);
+    this.logger.error("interpret", `reached unreachable code at '${this.evaluate.name}'!`);
     return null;
   }
 
@@ -117,10 +117,12 @@ export class Interpreter {
         return this.visitAssignExpr(expr);
       default:
         assertNever(expr);
+        // @ts-expect-error
+        throw new Error(`NOT IMPLEMENTED: expression '${expr?.type}' needs to be implemented`);
     }
 
     // unreachable
-    this.logger.error(`reached unreachable code at '${this.evaluate.name}'!`);
+    this.logger.error("interpret", `reached unreachable code at '${this.evaluate.name}'!`);
     // @ts-expect-error
     return null;
   }
@@ -369,13 +371,14 @@ export class Interpreter {
     // @ts-ignore
     let expr: AnyExpr = stmt.expression || stmt.initializer || stmt;
 
-    this.logger.log("lisp-like: ", printAST(expr, PrintStyle.parenthesis));
-    this.logger.log("- - - - -");
-    this.logger.log("rpn      : ", printAST(expr, PrintStyle.rpn));
-    this.logger.log("- - - - -");
-    this.logger.log("ast      :\n", printAST(expr, PrintStyle.ast));
-    this.logger.log("- - - - -");
-    this.logger.log("ast(json):\n", ...JSON.stringify(printAST(expr, PrintStyle.json), null, 3).split("\n")); // prettier-ignore
-    this.logger.log(" ");
+    // prettier-ignore
+    this.logger.debug?.("interpret","lisp-like: ", printAST(expr, PrintStyle.parenthesis) as string);
+    this.logger.debug?.("interpret", "- - - - -");
+    this.logger.debug?.("interpret", "rpn      : ", printAST(expr, PrintStyle.rpn) as string);
+    this.logger.debug?.("interpret", "- - - - -");
+    this.logger.debug?.("interpret", "ast      :\n", printAST(expr, PrintStyle.ast) as string);
+    this.logger.debug?.("interpret", "- - - - -");
+    this.logger.debug?.("interpret","ast(json):\n", ...JSON.stringify(printAST(expr, PrintStyle.json), null, 3).split("\n")); // prettier-ignore
+    this.logger.debug?.("interpret", " ");
   }
 }

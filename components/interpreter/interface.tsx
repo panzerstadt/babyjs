@@ -6,27 +6,25 @@ import { useStd } from "./useStd";
 import { Container } from "../terminals/Neumorphic/Container";
 
 export type Line = { type: LineType; value: string };
-type LineType = "out" | "err" | "info" | "usr" | "usr-tmp";
+type LineType = "out" | "err" | "info" | "debug" | "usr" | "usr-tmp";
 const TABS = 4;
+const INTRO_LINE: Line = { type: "out", value: "Hello there. type 'help' for a nice intro." };
 
 interface InterpreterProps {
+  multiTerminal?: boolean;
   focus?: number; // a random number to trigger a useEffect dep
   onResult?: () => void; // pipe out
 }
 export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
   const cursor = useRef<HTMLInputElement>(null);
-  const terminal = useRef<HTMLDivElement>(null);
   const program = useRef<Program>();
 
   const [userInputBuffer, setUserInputBuffer] = useState("");
-  const [lines, setLines] = useState<Line[]>([
-    { type: "out", value: "Hello there. type 'help' for a nice intro." },
-  ]);
+  const [lines, setLines] = useState<Line[]>([INTRO_LINE]);
 
-  useEffect(() => {
-    program.current = new Program();
-  }, []);
+  useEffect(() => { program.current = new Program() }, []); // prettier-ignore
   useStd(program, "out", setLines, () => scrollToBottom());
+  useStd(program, "debug", setLines, () => scrollToBottom()); // vvvv
   useStd(program, "err", setLines, () => scrollToBottom(), true);
   useStd(program, "info", setLines, () => scrollToBottom(), true);
 
@@ -148,6 +146,15 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
     scrollToBottom();
   };
 
+  const styles: { [key in LineType]: string } = {
+    out: "text-slate-300",
+    debug: "text-slate-400",
+    err: "text-red-500",
+    usr: "text-sky-600",
+    "usr-tmp": "text-sky-800",
+    info: "text-orange-700 text-[11px] leading-[13px] select-none",
+  };
+
   return (
     <Container
       key="terminal-container"
@@ -157,21 +164,14 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
       bordered
     >
       <div className="relative bg-stone-900 w-full h-full text-slate-300 sm:rounded-lg p-6 border border-zinc-200 text-sm font-mono">
-        <div ref={terminal} className="h-full overflow-auto flex flex-col">
+        <div className="h-full overflow-auto flex flex-col">
           {lines.map((s, i) => {
-            const styles: { [key in LineType]: string } = {
-              out: "text-slate-300",
-              err: "text-red-500",
-              usr: "text-sky-600",
-              "usr-tmp": "text-sky-800",
-              info: "text-orange-700 text-[11px] leading-[13px] select-none",
-            };
             return (
               <code
                 key={i}
                 className={`
-              ${styles[s.type]} hover:bg-slate-800
-              animate-fade whitespace-break-spaces`}
+                ${styles[s.type]} hover:bg-slate-800
+                animate-fade whitespace-break-spaces`}
               >
                 {s.value}
               </code>

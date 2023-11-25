@@ -57,7 +57,7 @@ export class Scanner {
       this._error.printErrors();
     }
 
-    debug && this.logger.log("Tokens:\n", this.tokens);
+    debug && this.logger.debug?.("scan", "Tokens:\n", ...this.tokens.map((t) => t.toString()));
     return this.tokens;
   }
 

@@ -41,12 +41,12 @@ ${pointToErrorAt(col, line, multiline)}
   }
 
   printErrors() {
-    this.logger.error("SCAN ERROR: Errors found when lexing the file.");
-    this.logger.error("----------------START------------------");
+    this.logger.error("scan", "SCAN ERROR: Errors found when lexing the file.");
+    this.logger.error("scan", "----------------START------------------");
     this.errors.forEach((e) => {
-      this.logger.error(e);
+      this.logger.error("scan", e);
     });
-    this.logger.error("-----------------END-------------------");
+    this.logger.error("scan", "-----------------END-------------------");
   }
 }
 
@@ -105,12 +105,15 @@ export class ParseError {
   }
 
   printErrors() {
-    this.logger.error("PARSE ERROR: Errors found when parsing scanned tokens from the file.");
-    this.logger.error("----------------START------------------");
+    this.logger.error(
+      "parse",
+      "PARSE ERROR: Errors found when parsing scanned tokens from the file."
+    );
+    this.logger.error("parse", "----------------START------------------");
     this.errors.forEach((e) => {
-      this.logger.error(e);
+      this.logger.error("parse", e);
     });
-    this.logger.error("-----------------END-------------------");
+    this.logger.error("parse", "-----------------END-------------------");
   }
 }
 

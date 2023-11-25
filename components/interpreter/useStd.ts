@@ -10,9 +10,19 @@ const removeTimestamp = (str: string) => {
   return str.slice(length);
 };
 
+/**
+ * TODO: turn this into 3 sub-terminals
+ */
+const removePhase = (str: string) => {
+  if (str.startsWith("scan:")) return str.slice(5);
+  if (str.startsWith("parse:")) return str.slice(6);
+  if (str.startsWith("interpret:")) return str.slice(10);
+  return str;
+};
+
 export const useStd = (
   ref: MutableRefObject<Program | undefined>,
-  stdType: "out" | "err" | "info",
+  stdType: "out" | "err" | "info" | "debug",
   setLines: Dispatch<SetStateAction<Line[]>>,
   onLineOut?: () => void,
   immediate?: boolean
@@ -23,14 +33,11 @@ export const useStd = (
     if (!currentRef) return;
     const std = currentRef
       .split("\n")
-      .map((s) => ({ type: stdType, value: removeTimestamp(s) || " " }));
+      .map((s) => ({ type: stdType, value: removePhase(removeTimestamp(s)) || " " }));
 
     if (std) {
-      // 1. dump them all into a queue.
       queue?.enqueue_batch(std);
     }
-
-    // std && setLines((p) => [...p, ...std]);
   }, [currentRef, stdType, setLines, queue]);
 
   useEffect(() => {

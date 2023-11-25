@@ -1,5 +1,5 @@
 import { BabyJs } from "../../programs/babyjs/babyjs";
-import { LoggerType } from "../../programs/babyjs/types";
+import { LoggerType, Phase } from "../../programs/babyjs/types";
 
 export class Program {
   verbose = false;
@@ -7,6 +7,7 @@ export class Program {
   stdout = "";
   stderr = "";
   stdinfo = "";
+  stddebug = "";
 
   constructor() {
     this.interpreter = new BabyJs();
@@ -32,14 +33,20 @@ export class Program {
           .map((s) => `${this.timestamp()}:${s}\n`)
           .join("");
       },
-      error: (str: string) => {
+      error: (phase: Phase, str: string) => {
         const strs = str.split("\n");
-        this.stderr += strs.map((s) => `${this.timestamp()}:${s}\n`).join("");
+        this.stderr += strs.map((s) => `${this.timestamp()}:${phase}:${s}\n`).join("");
       },
       info: (...strs: string[]) => {
         this.stdinfo += strs
           .flat(5)
           .map((s) => `${this.timestamp()}:${s}\n`)
+          .join("");
+      },
+      debug: (phase: Phase, ...strs: string[]) => {
+        this.stddebug += strs
+          .flat(5)
+          .map((s) => `${this.timestamp()}:${phase}:${s}\n`)
           .join("");
       },
     };
@@ -49,6 +56,7 @@ export class Program {
     this.stdout = "";
     this.stderr = "";
     this.stdinfo = "";
+    this.stddebug = "";
   }
 
   input(code: string) {
