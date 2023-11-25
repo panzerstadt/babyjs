@@ -41,6 +41,7 @@ export const keywords = {
   and: TokenType.AND,
   or: TokenType.OR,
   while: TokenType.WHILE,
+  fn: TokenType.FUNC,
   for: TokenType.FOR,
   in: TokenType.IN,
 } as const;
@@ -50,5 +51,6 @@ export const accidentalKeywords = {
 } as const;
 
 export const _UNINITIALIZED = Symbol("uninitialized"); // sentinel value
+export const _EMPTY_FN_RETURN = Symbol("empty_fn_return"); // sentinel value
 
 export type Keywords = Partial<keyof typeof keywords | keyof typeof accidentalKeywords>;

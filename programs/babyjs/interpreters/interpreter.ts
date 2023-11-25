@@ -6,6 +6,10 @@ import { Token, _UNINITIALIZED } from "../token";
 import { LoggerType, TokenType, assertNever } from "../types";
 import { PrintStyle, printAST } from "./pprinter";
 import { isTruthy } from "../constants";
+import { Callable } from "../callable";
+import { Clock } from "../functions/foreignfunctions/clock";
+import { Ls } from "../functions/foreignfunctions/blogInterface";
+import { Function } from "../functions/basefunction";
 
 const statementIsVariableExpression = (
   statements: AnyStmt[]
@@ -72,6 +76,8 @@ export class Interpreter {
         return this.visitWhileStmt(stmt, debug);
       case "print":
         return this.visitPrintStmt(stmt, debug);
+      case "function":
+        return this.visitFunctionStmt(stmt, debug);
       case "let":
         return this.visitLetStmt(stmt, debug);
       case "block":
@@ -89,7 +95,7 @@ export class Interpreter {
     return null;
   }
 
-  private executeBlock(statements: AnyStmt[], environment: Environment, debug?: boolean) {
+  executeBlock(statements: AnyStmt[], environment: Environment, debug?: boolean) {
     const previous = this.environment;
     try {
       this.environment = environment;
@@ -118,6 +124,8 @@ export class Interpreter {
         return this.visitLogicalExpr(expr);
       case "unary":
         return this.visitUnaryExpr(expr);
+      case "call":
+        return this.visitCallExpr(expr);
       case "variable":
         return this.visitVariableExpr(expr);
       case "assign":
@@ -194,6 +202,31 @@ export class Interpreter {
 
   public visitGroupingExpr(expr: Expr["Grouping"]): Object {
     return this.evaluate(expr.expression)!;
+  }
+
+  private _isCallable(object: any): object is Callable {
+    return typeof object.call !== "undefined" && typeof object.call === "function";
+  }
+
+  public visitCallExpr(expr: Expr["Call"]): Object {
+    const callee = this.evaluate(expr.callee);
+
+    let _arguments: Object[] = [];
+    for (const _argument of expr.arguments) {
+      _arguments.push(this.evaluate(_argument));
+    }
+
+    if (!this._isCallable(callee)) {
+      throw new RuntimeError("Can only call functions and classes.", expr.paren);
+    }
+    const _function = callee;
+    // artiy = expected argument count
+    if (_arguments.length !== _function.arity()) {
+      throw new RuntimeError(
+        `Expected ${_function.arity()} arguments but got ${_arguments.length}`
+      );
+    }
+    return _function.call(this, _arguments);
   }
 
   public visitUnaryExpr(expr: Expr["Unary"]): Object {
@@ -348,8 +381,18 @@ export class Interpreter {
 
     const value = this.evaluate(stmt.expression);
 
+    let safeValue = value;
+    if (value.toString().startsWith("<")) {
+      safeValue = value.toString();
+    }
+
     debug && this.logger.log("Interpreted Output:");
-    this.logger.log(">>", value);
+    this.logger.log(">>", safeValue);
+  }
+
+  public visitFunctionStmt(stmt: Stmt["Function"], debug?: boolean): void {
+    const _function = new Function(stmt);
+    this.environment.define(stmt.name.lexeme, _function);
   }
 
   public visitLetStmt(stmt: Stmt["Let"], debug?: boolean): void {

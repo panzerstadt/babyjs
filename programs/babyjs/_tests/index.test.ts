@@ -640,4 +640,38 @@ describe("babyjs", () => {
       });
     });
   });
+
+  describe("functions", () => {
+    it("works", () => {
+      const code = `fn sayHi(first, last) {
+        print "Hi, " + first + " " + last + "!";
+      }
+      
+      sayHi("Dear", "Reader");`;
+
+      babyjs.runOnce(code);
+
+      expect(logger.error).not.toHaveBeenCalled();
+      expect(logger.log).toHaveBeenLastCalledWith(">>", "Hi, Dear Reader!");
+    });
+    it("prints uncalled functions properly", () => {
+      const code = "fn myFunc() {} print myFunc;";
+      babyjs.runOnce(code);
+
+      expect(logger.error).not.toHaveBeenCalled();
+      expect(logger.log).toHaveBeenLastCalledWith(">>", "<fn myFunc () >");
+    });
+    /**
+     * this is because i'm casting functions by calling toString that
+     * results in the above result ^ instead of the internal object
+     * and its done by looking for "<" in the stringified value
+     */
+    it("print things with '<' works", () => {
+      const code = `print "<";`;
+      babyjs.runOnce(code);
+
+      expect(logger.error).not.toHaveBeenCalled();
+      expect(logger.log).toHaveBeenLastCalledWith(">>", "<");
+    });
+  });
 });

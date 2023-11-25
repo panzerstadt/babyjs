@@ -3,6 +3,7 @@ import { AnyExpr, Expr } from "./constructs/expressions";
 import { AnyStmt, Stmt } from "./constructs/statements";
 import { Token } from "./token";
 import { LoggerType, TokenType } from "./types";
+import { MAX_PARAMETER_COUNT } from "./constants";
 
 // TODO: fun extra challenge: support IF x THEN y ELSE z
 // which is different from js ternaries (also included) as well as python ternaries (expr1 if condition else expr2)
@@ -10,6 +11,9 @@ import { LoggerType, TokenType } from "./types";
 /*
 Scanner = reads characters left to right
 Parser = reads Tokens left to right
+Higher Precedence = inner layer (e.g. factor has higher precedence than term
+                    because factor is the inner call of term
+read precedence like top = lowest, bottom = highest
 ------
 Expression Grammar for this parser in Backus-Naur Form (BNF) (subset of statement grammar)
 expression     → assignment ;
@@ -22,15 +26,17 @@ equality       → comparison ( ( "!=" | "==" ) comparison )* ;
 comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
 term           → factor ( ( "-" | "+" ) factor )* ;
 factor         → unary ( ( "/" | "*" ) unary )* ;
-unary          → ( "!" | "-" ) unary
-               | primary ;
+unary          → ( "!" | "-" ) unary | call ;
+call           → primary ( "(" arguments? ")" )* ;
+arguments      → expression ( "," expression )* ;
 primary        → NUMBER | STRING | "true" | "false"
                | "(" expression ")" | IDENTIFIER ;
 -------
 Statement Grammar for this parser (BNF) (superset)
 program        → declaration* EOF ;
 
-declaration    → varDecl // variables for now, functions and classes later
+declaration    → funDecl
+               | varDecl
                | statement ;
 
 statement      → exprStmt
@@ -49,6 +55,9 @@ ifStmt         → "if" "(" expression ")" statement
 printStmt      → "print" expression ";" ;   
 block          → "{" declaration* "}" ;
 varDecl        → "let" IDENTIFIER ( "=" expression )? ";"
+funDecl        → "fn" function ;
+function       → IDENTIFIER "(" parameters? ")" block ;
+parameters     → IDENTIFIER ( "," IDENTIFIER )* ;
 
 program represents a complete Lox script/repl entry.
 a Program = a list of statements followed by an End-Of-File token
@@ -256,7 +265,46 @@ export class Parser {
       return Expr.Unary(operator, right);
     }
 
-    return this.primary();
+    return this.call();
+  }
+
+  private call(): AnyExpr {
+    let expr = this.primary();
+
+    while (true) {
+      if (this.match(TokenType.LEFT_PAREN)) {
+        /**
+         * it’s roughly similar to how we parse infix operators.
+         * First, we parse a primary expression, the “left operand”
+         * to the call. Then, each time we see a (, we call finishCall()
+         * to parse the call expression using the previously parsed
+         * expression as the callee. The returned expression becomes
+         * the new expr and we loop to see if the result is itself called.
+         */
+        expr = this.finishCall(expr);
+      } else {
+        break;
+      }
+    }
+
+    return expr;
+  }
+
+  private finishCall(callee: AnyExpr): AnyExpr {
+    let _arguments: AnyExpr[] = [];
+    if (!this.check(TokenType.RIGHT_PAREN)) {
+      do {
+        // makes bytecode interpreter easier (but actually no other reason to limit)
+        if (_arguments.length >= MAX_PARAMETER_COUNT) {
+          this.error(this.peek(), `Can't have more than ${MAX_PARAMETER_COUNT} arguments.`);
+        }
+        _arguments.push(this.expression());
+      } while (this.match(TokenType.COMMA));
+    }
+
+    const paren = this.consume(TokenType.RIGHT_PAREN, "Expect ')' after arguments.");
+
+    return Expr.Call(callee, paren, _arguments);
   }
 
   // primary -> NUMBER | STRING | "true" | "false" | "(" expression ")"
@@ -476,6 +524,32 @@ export class Parser {
     return Stmt.Expression(expr);
   }
 
+  private function(kind: string): Stmt["Function"] {
+    const name = this.consume(TokenType.IDENTIFIER, `Expect ${kind} name.`);
+    this.consume(TokenType.LEFT_PAREN, `Expect '(' after ${kind} name.`);
+    const parameters: Token[] = [];
+
+    /**
+     * The outer if statement handles the zero parameter case, and the inner while
+     * loop parses parameters as long as we find commas to separate them.
+     * The result is the list of tokens for each parameter’s name.
+     */
+    if (!this.check(TokenType.RIGHT_PAREN)) {
+      do {
+        if (parameters.length >= MAX_PARAMETER_COUNT) {
+          this.error(this.peek(), `Can't have more than ${MAX_PARAMETER_COUNT} parameters.`);
+        }
+
+        parameters.push(this.consume(TokenType.IDENTIFIER, "Expect parameter name."));
+      } while (this.match(TokenType.COMMA));
+    }
+    this.consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters.");
+
+    this.consume(TokenType.LEFT_BRACE, `Expect '{' before ${kind} body.`);
+    const body = this.block();
+    return Stmt.Function(name, parameters, body);
+  }
+
   private varDeclaration() {
     const name = this.consume(TokenType.IDENTIFIER, "Expect variable name");
     let initializer = null;
@@ -510,6 +584,7 @@ export class Parser {
 
   private declaration(): AnyStmt {
     try {
+      if (this.match(TokenType.FUNC)) return this.function("function");
       if (this.match(TokenType.LET)) return this.varDeclaration();
 
       return this.statement();

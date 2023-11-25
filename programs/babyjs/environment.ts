@@ -10,7 +10,7 @@ export class Environment {
   private strict = true;
   private debug = false;
   private identifier: string | null = null;
-  logger: Console | LoggerType = console;
+  logger: LoggerType = console;
 
   private readonly values: Map<string, Object | typeof _UNINITIALIZED> = new Map();
   readonly enclosing: Environment | null;
@@ -50,7 +50,7 @@ export class Environment {
    * - declare variable without assignment
    * - declare variable with assignment of valid value
    */
-  define(name: string, value: Object | typeof _UNINITIALIZED, token: Token) {
+  define(name: string, value: Object | typeof _UNINITIALIZED, token?: Token) {
     const hasBeenDeclared = this.values.has(name);
 
     if (this.strict && hasBeenDeclared) {

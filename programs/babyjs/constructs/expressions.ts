@@ -46,6 +46,18 @@ const binary = (left: AnyExpr, operator: Token, right: AnyExpr): Binary => {
   };
 };
 
+interface Call {
+  readonly type: "call";
+  readonly callee: AnyExpr;
+  readonly paren: Token;
+  readonly arguments: AnyExpr[];
+}
+
+// arguments is a reserved word XD
+const call = (callee: AnyExpr, paren: Token, _arguments: AnyExpr[]): Call => {
+  return { type: "call", callee, paren, arguments: _arguments };
+};
+
 interface Grouping {
   readonly type: "grouping";
   readonly expression: AnyExpr;
@@ -107,10 +119,20 @@ const variable = (name: Token): Variable => {
   return { type: "variable", name };
 };
 
-export type AnyExpr = Ternary | Binary | Grouping | Literal | Logical | Unary | Variable | Assign;
+export type AnyExpr =
+  | Ternary
+  | Binary
+  | Call
+  | Grouping
+  | Literal
+  | Logical
+  | Unary
+  | Variable
+  | Assign;
 export interface Expr {
   Ternary: Ternary;
   Binary: Binary;
+  Call: Call;
   Grouping: Grouping;
   Literal: Literal;
   Logical: Logical;
@@ -121,6 +143,7 @@ export interface Expr {
 export const Expr = {
   Ternary: ternary,
   Binary: binary,
+  Call: call,
   Grouping: grouping,
   Literal: literal,
   Logical: logical,

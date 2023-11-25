@@ -20,6 +20,17 @@ const whileexpr = (condition: AnyExpr, body: AnyStmt): While => {
   return { type: "while", condition, body };
 };
 
+interface Function {
+  readonly type: "function";
+  readonly name: Token;
+  readonly params: Token[];
+  readonly body: AnyStmt[];
+}
+
+const functionStmt = (name: Token, params: Token[], body: AnyStmt[]): Function => {
+  return { type: "function", name, params, body };
+};
+
 interface If {
   readonly type: "if";
   readonly condition: AnyExpr;
@@ -78,10 +89,11 @@ const rangeFor = (
   return { type: "rangeFor", initializerName, start, end, inclusive, body };
 };
 
-export type AnyStmt = Expression | If | Print | Let | Block | While | RangeFor;
+export type AnyStmt = Expression | Function | If | Print | Let | Block | While | RangeFor;
 export interface Stmt {
   Expression: Expression;
   While: While;
+  Function: Function;
   If: If;
   Print: Print;
   Let: Let;
@@ -91,6 +103,7 @@ export interface Stmt {
 export const Stmt = {
   Expression: expression,
   While: whileexpr,
+  Function: functionStmt,
   If: ifexpr,
   Print: print,
   Let: letStmt,
