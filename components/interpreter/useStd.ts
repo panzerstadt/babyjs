@@ -1,9 +1,9 @@
 import { Dispatch, MutableRefObject, SetStateAction, useEffect } from "react";
-import { Program } from "./program";
+import { Program, StdEnvs } from "./program";
 import { Line } from "./interface";
 import { useQueue } from "../queue/useQueue";
 
-const TERMINAL_SPEED_MS = 50;
+const TERMINAL_SPEED_MS = 30;
 
 const removeTimestamp = (str: string) => {
   const length = Date.now().toString().length + ":".length;
@@ -22,7 +22,7 @@ const removePhase = (str: string) => {
 
 export const useStd = (
   ref: MutableRefObject<Program | undefined>,
-  stdType: "out" | "err" | "info" | "debug",
+  stdType: StdEnvs,
   setLines: Dispatch<SetStateAction<Line[]>>,
   onLineOut?: () => void,
   immediate?: boolean

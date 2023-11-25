@@ -1,6 +1,8 @@
 import { BabyJs } from "../../programs/babyjs/babyjs";
 import { LoggerType, Phase } from "../../programs/babyjs/types";
 
+export type StdEnvs = "out" | "err" | "info" | "debug" | "env";
+
 export class Program {
   verbose = false;
   interpreter: BabyJs;
@@ -8,6 +10,7 @@ export class Program {
   stderr = "";
   stdinfo = "";
   stddebug = "";
+  stdenv = "";
 
   constructor() {
     this.interpreter = new BabyJs();
@@ -45,6 +48,12 @@ export class Program {
           .map((s) => `${this.timestamp()}:${s}\n`)
           .join("");
       },
+      environment: (...strs: string[]) => {
+        this.stddebug += strs
+          .flat(5)
+          .map((s) => `${this.timestamp()}:${s}\n`)
+          .join("");
+      },
       debug: (phase: Phase, ...strs: string[]) => {
         this.stddebug += strs
           .flat(5)
@@ -59,6 +68,7 @@ export class Program {
     this.stderr = "";
     this.stdinfo = "";
     this.stddebug = "";
+    this.stdenv = "";
   }
 
   input(code: string) {

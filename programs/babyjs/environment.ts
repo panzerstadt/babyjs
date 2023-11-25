@@ -15,12 +15,12 @@ export class Environment {
   private readonly values: Map<string, Object | typeof _UNINITIALIZED> = new Map();
   readonly enclosing: Environment | null;
 
-  public printEnvironment(op: string) {
+  public debugPrintEnvironment(op: string) {
     let store = { id: this.identifier };
     this.values.forEach((v, k) => {
       store = { ...store, [k]: v };
     });
-    this.logger.log(
+    this.logger.environment?.(
       `env:${op} on ${this.identifier}: size ${this.values.size}`,
       ...JSON.stringify(store, null, 4).split("\n")
     );
@@ -73,14 +73,14 @@ e.g: let my_variable = "one"; ---> my_variable = "two";
     // only visitLetStmt can do this
     if (value === _UNINITIALIZED) {
       this.values.set(name, _UNINITIALIZED);
-      this.debug && this.printEnvironment(this.assign.name);
+      this.debug && this.debugPrintEnvironment(this.assign.name);
       return;
     }
 
     // variable declaration with user value (e.g. let foo = 1;)
     if (canDeclareWithValue(value)) {
       this.values.set(name, value);
-      this.debug && this.printEnvironment(this.assign.name);
+      this.debug && this.debugPrintEnvironment(this.assign.name);
       return;
     }
 
@@ -110,7 +110,7 @@ e.g: let my_variable = "one"; ---> my_variable = "two";
         // );
       }
       this.values.set(name.lexeme, value);
-      this.debug && this.printEnvironment(this.assign.name);
+      this.debug && this.debugPrintEnvironment(this.assign.name);
       return;
     }
 
@@ -122,7 +122,7 @@ e.g: let my_variable = "one"; ---> my_variable = "two";
 
   get(name: Token): Object {
     if (this.values.has(name.lexeme)) {
-      this.debug && this.printEnvironment(this.get.name);
+      this.debug && this.debugPrintEnvironment(this.get.name);
       const value = this.values.get(name.lexeme)!;
 
       // if this value has not been initialized by the user, throw

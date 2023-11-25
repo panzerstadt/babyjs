@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { Program } from "./program";
+import { Program, StdEnvs } from "./program";
 import { useHistory } from "./useHistory";
 import { Tips } from "./tips";
 import { useStd } from "./useStd";
 import { Container } from "../terminals/Neumorphic/Container";
 
 export type Line = { type: LineType; value: string };
-type LineType = "out" | "err" | "info" | "debug" | "usr" | "usr-tmp";
+type LineType = StdEnvs | "usr" | "usr-tmp";
 const TABS = 4;
 const INTRO_LINE: Line = { type: "out", value: "Hello there. type 'help' for a nice intro." };
 
@@ -149,6 +149,7 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
   const styles: { [key in LineType]: string } = {
     out: "text-slate-300",
     debug: "text-slate-400",
+    env: "text-slate-400",
     err: "text-red-500",
     usr: "text-sky-600",
     "usr-tmp": "text-sky-800",
@@ -165,18 +166,34 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
     >
       <div className="relative bg-stone-900 w-full h-full text-slate-300 sm:rounded-lg p-6 border border-zinc-200 text-sm font-mono">
         <div className="h-full overflow-auto flex flex-col">
-          {lines.map((s, i) => {
-            return (
-              <code
-                key={i}
-                className={`
+          {lines
+            .filter((l) => l.type !== "debug")
+            .map((s, i) => {
+              return (
+                <code
+                  key={i}
+                  className={`
                 ${styles[s.type]} hover:bg-slate-800
                 animate-fade whitespace-break-spaces`}
-              >
-                {s.value}
-              </code>
-            );
-          })}
+                >
+                  {s.value}
+                </code>
+              );
+            })}
+          {lines
+            .filter((l) => l.type === "debug")
+            .map((s, i) => {
+              return (
+                <code
+                  key={i}
+                  className={`
+                ${styles[s.type]} hover:bg-slate-800
+                animate-fade whitespace-break-spaces`}
+                >
+                  {s.value}
+                </code>
+              );
+            })}
           <div className="flex items-start">
             <input
               ref={cursor}

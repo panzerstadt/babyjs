@@ -99,7 +99,7 @@ export class Interpreter {
     const previous = this.environment;
     try {
       this.environment = environment;
-      debug && this.environment.printEnvironment("newEnv");
+      debug && this.environment.debugPrintEnvironment("newEnv");
 
       for (const statement of statements) {
         this.execute(statement, debug);
