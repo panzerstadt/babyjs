@@ -17,6 +17,19 @@ BabyJS is also integrated into my [blog site](https://prng-v3.vercel.app/) with 
 - an we always create a function graph during interpretation, so that when an error stack happens, we show the graph?
 - in recursive functions, can we have a visualization? just boxes pointing to other boxes (linkedlist-like)
 
+## how to deal with nulls
+
+ref: `https://medium.com/free-code-camp/a-quick-and-thorough-guide-to-null-what-it-is-and-how-you-should-use-it-d170cea62840#:~:text=Note%3A%20Some%20programming%20languages%20(mostly,value'%20case%20is%20handled%20explicitly.`
+
+```js
+const SENTINEL_VALUES = ['uninitialized', 'empty_function_return']
+// unitialized
+emailaddress = null; // you mean you don't know the emailaddress yet. -> uninitialized
+
+// its not giving me back anything
+function() {}; // you mean your function is just side effects, you're not returning anything from the function to pass in
+```
+
 ## NextJS setup
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
