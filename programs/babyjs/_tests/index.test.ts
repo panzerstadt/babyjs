@@ -9,7 +9,7 @@ describe("babyjs", () => {
     info: jest.fn((...s: string[]) => {
       console.info("log:", ...s);
     }),
-    error: jest.fn((...e: string[]) => {
+    error: jest.fn((phase: string, ...e: string[]) => {
       console.log("err:", ...e);
     }),
   };
@@ -93,6 +93,7 @@ describe("babyjs", () => {
       babyjs.runOnce(code);
 
       expect(logger.error).toHaveBeenCalledWith(
+        "interpret",
         expect.stringContaining("Undefined variable 'nil'")
       );
       expect(logger.log).not.toHaveBeenCalled();
@@ -101,7 +102,7 @@ describe("babyjs", () => {
       const code = `let one = null;print one;`;
       babyjs.runOnce(code);
 
-      expect(logger.error).toHaveBeenCalledWith(expect.stringContaining("SCAN ERROR"));
+      expect(logger.error).toHaveBeenCalledWith("scan", expect.stringContaining("SCAN ERROR"));
       expect(logger.log).not.toHaveBeenCalled();
     });
     it("cannot store nullish values: undefined (js:leaky)", () => {
@@ -110,6 +111,7 @@ describe("babyjs", () => {
       babyjs.runOnce(code);
 
       expect(logger.error).toHaveBeenCalledWith(
+        "interpret",
         expect.stringContaining("Undefined variable 'undefined'")
       );
       expect(logger.log).not.toHaveBeenCalled();
@@ -145,6 +147,7 @@ describe("babyjs", () => {
       babyjs.runOnce(code);
 
       expect(logger.error).toHaveBeenCalledWith(
+        "interpret",
         expect.stringContaining("Variable has already been defined")
       );
       expect(logger.log).not.toHaveBeenCalled();
@@ -154,6 +157,7 @@ describe("babyjs", () => {
       babyjs.runOnce(code);
 
       expect(logger.error).toHaveBeenCalledWith(
+        "interpret",
         expect.stringContaining("Variable has already been defined")
       );
       expect(logger.log).not.toHaveBeenCalled();
@@ -213,7 +217,10 @@ describe("babyjs", () => {
       const code = `let a; print a;`;
       babyjs.runOnce(code);
 
-      expect(logger.error).toHaveBeenCalledWith(expect.stringContaining("used before assignment"));
+      expect(logger.error).toHaveBeenCalledWith(
+        "interpret",
+        expect.stringContaining("used before assignment")
+      );
       expect(logger.log).not.toHaveBeenCalled();
     });
   });
@@ -226,6 +233,7 @@ describe("babyjs", () => {
       expect(logger.log).not.toHaveBeenCalled();
       expect(logger.error).toHaveBeenNthCalledWith(
         3,
+        "parse",
         expect.stringContaining("Expected an operand before '=='")
       );
     });
@@ -235,6 +243,7 @@ describe("babyjs", () => {
 
       expect(logger.error).toHaveBeenNthCalledWith(
         3,
+        "parse",
         expect.stringContaining("Expected an operand before '!='")
       );
     });
@@ -244,10 +253,12 @@ describe("babyjs", () => {
 
       expect(logger.error).toHaveBeenNthCalledWith(
         3,
+        "parse",
         expect.stringContaining("Expected an operand before '<='")
       );
       expect(logger.error).toHaveBeenNthCalledWith(
         4,
+        "parse",
         expect.stringContaining("Expected an operand before '=='")
       );
     });
@@ -324,7 +335,10 @@ describe("babyjs", () => {
       const code = `while (true) { }`;
       babyjs.runOnce(code);
 
-      expect(logger.error).toHaveBeenCalledWith(expect.stringContaining("Infinite loop detected"));
+      expect(logger.error).toHaveBeenCalledWith(
+        "interpret",
+        expect.stringContaining("Infinite loop detected")
+      );
       expect(logger.log).not.toHaveBeenCalled();
     });
   });
@@ -345,6 +359,21 @@ describe("babyjs", () => {
       expect(logger.error).not.toHaveBeenCalled();
       expect(logger.log).toHaveBeenCalledTimes(11);
       expect(logger.log).toHaveBeenLastCalledWith(">>", 99);
+    });
+    it("can do fibonacci", () => {
+      const code = `let a = 0;
+      let temp;
+      
+      for (let b = 1; a < 10000; b = temp + b) {
+        print a;
+        temp = a;
+        a = b;
+      }`;
+      babyjs.runOnce(code);
+
+      expect(logger.error).not.toHaveBeenCalled();
+      expect(logger.log).toHaveBeenCalledTimes(21);
+      expect(logger.log).toHaveBeenLastCalledWith(">>", 6765);
     });
 
     describe("rusty for loops (rangeFor)", () => {
@@ -393,6 +422,7 @@ describe("babyjs", () => {
         babyjs.runOnce(code);
 
         expect(logger.error).toHaveBeenCalledWith(
+          "interpret",
           expect.stringContaining("must evaluate to numbers")
         );
         expect(logger.log).not.toHaveBeenCalled();
