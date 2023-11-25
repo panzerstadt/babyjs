@@ -661,6 +661,13 @@ describe("babyjs", () => {
       expect(logger.error).not.toHaveBeenCalled();
       expect(logger.log).toHaveBeenLastCalledWith(">>", "<fn myFunc () >");
     });
+    it("prints uncalled functions properly (with parameters", () => {
+      const code = "fn myFunc(param1, param2) {} print myFunc;";
+      babyjs.runOnce(code);
+
+      expect(logger.error).not.toHaveBeenCalled();
+      expect(logger.log).toHaveBeenLastCalledWith(">>", "<fn myFunc (param1,param2) >");
+    });
     /**
      * this is because i'm casting functions by calling toString that
      * results in the above result ^ instead of the internal object
