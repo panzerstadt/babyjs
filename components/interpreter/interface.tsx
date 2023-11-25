@@ -177,7 +177,7 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
               </code>
             );
           })}
-          <div className="flex">
+          <div className="flex items-start">
             <input
               ref={cursor}
               onChange={handleUserInput}
