@@ -3,6 +3,7 @@ import { Program } from "./program";
 import { useHistory } from "./useHistory";
 import { Tips } from "./tips";
 import { useStd } from "./useStd";
+import { Container } from "../terminals/Neumorphic/Container";
 
 export type Line = { type: LineType; value: string };
 type LineType = "out" | "err" | "info" | "usr" | "usr-tmp";
@@ -148,57 +149,65 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
   };
 
   return (
-    <div className="relative bg-stone-900 w-full h-full text-slate-300 sm:rounded-lg p-6 border border-zinc-200 text-sm font-mono">
-      <div ref={terminal} className="h-full overflow-auto flex flex-col">
-        {lines.map((s, i) => {
-          const styles: { [key in LineType]: string } = {
-            out: "text-slate-300",
-            err: "text-red-500",
-            usr: "text-sky-600",
-            "usr-tmp": "text-sky-800",
-            info: "text-orange-700 text-[11px] leading-[13px] select-none",
-          };
-          return (
-            <code
-              key={i}
-              className={`
+    <Container
+      key="terminal-container"
+      bgColor="bg-stone-200"
+      roundedClass="rounded-lg"
+      distance={5}
+      bordered
+    >
+      <div className="relative bg-stone-900 w-full h-full text-slate-300 sm:rounded-lg p-6 border border-zinc-200 text-sm font-mono">
+        <div ref={terminal} className="h-full overflow-auto flex flex-col">
+          {lines.map((s, i) => {
+            const styles: { [key in LineType]: string } = {
+              out: "text-slate-300",
+              err: "text-red-500",
+              usr: "text-sky-600",
+              "usr-tmp": "text-sky-800",
+              info: "text-orange-700 text-[11px] leading-[13px] select-none",
+            };
+            return (
+              <code
+                key={i}
+                className={`
               ${styles[s.type]} hover:bg-slate-800
               animate-fade whitespace-break-spaces`}
-            >
-              {s.value}
-            </code>
-          );
-        })}
-        <div className="flex">
-          <input
-            ref={cursor}
-            onChange={handleUserInput}
-            onKeyDown={handleKeydown}
-            className="bg-transparent text-sky-500 w-full outline-none pb-5"
-            value={userInputBuffer}
-            placeholder=">_"
-          />
-          {toggledMultiline && (
-            <button
-              onClick={() => handleSendCode()}
-              className="text-sky-400 text-[10px] px-2 border border-sky-800 hover:bg-sky-400 hover:text-white rounded-md"
-            >
-              send
-            </button>
-          )}
-        </div>
-        <div className="-mt-4 text-[10px] leading-[10px] italic font-bold text-gray-700 select-none group">
-          <span>
-            <span>shift + enter to </span>
-            <span className={toggledMultiline ? "text-yellow-300" : ""}>multiline</span>
-            <span>, ctrl + shift to toggle</span>
-          </span>
-          <Tips />
-        </div>
-        <div onClick={() => handleFocusOnCursor()} className="flex flex-grow h-full">
-          {" "}
+              >
+                {s.value}
+              </code>
+            );
+          })}
+          <div className="flex">
+            <input
+              ref={cursor}
+              onChange={handleUserInput}
+              onKeyDown={handleKeydown}
+              className="bg-transparent text-sky-500 w-full outline-none pb-5"
+              value={userInputBuffer}
+              placeholder=">_"
+            />
+            {toggledMultiline && (
+              <button
+                onClick={() => handleSendCode()}
+                className="text-sky-400 text-[10px] px-2 border border-sky-800 hover:bg-sky-400 hover:text-white rounded-md"
+              >
+                send
+              </button>
+            )}
+          </div>
+          <div className="-mt-4 text-[10px] leading-[10px] italic font-bold text-gray-700 select-none group">
+            <span>
+              <span>shift + enter to </span>
+              <span className={toggledMultiline ? "text-yellow-300" : ""}>multiline</span>
+              <span>, ctrl + shift to toggle</span>
+            </span>
+            <Tips />
+          </div>
+          <div onClick={() => handleFocusOnCursor()} className="flex flex-grow h-full">
+            {" "}
+          </div>
         </div>
       </div>
-    </div>
+    </Container>
   );
 };
