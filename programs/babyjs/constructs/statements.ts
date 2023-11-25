@@ -1,4 +1,4 @@
-import { Token } from "../token";
+import { Token, _EMPTY_FN_RETURN } from "../token";
 import { AnyExpr } from "./expressions";
 
 interface Expression {
@@ -51,6 +51,16 @@ const print = (expression: AnyExpr): Print => {
   return { type: "print", expression };
 };
 
+interface Return {
+  readonly type: "return";
+  readonly keyword: Token;
+  readonly value: AnyExpr | typeof _EMPTY_FN_RETURN;
+}
+
+const returnStmt = (keyword: Token, value: AnyExpr | typeof _EMPTY_FN_RETURN): Return => {
+  return { type: "return", keyword, value };
+};
+
 interface Let {
   readonly type: "let";
   readonly name: Token;
@@ -89,13 +99,14 @@ const rangeFor = (
   return { type: "rangeFor", initializerName, start, end, inclusive, body };
 };
 
-export type AnyStmt = Expression | Function | If | Print | Let | Block | While | RangeFor;
+export type AnyStmt = Expression | Function | If | Print | Return | Let | Block | While | RangeFor;
 export interface Stmt {
   Expression: Expression;
   While: While;
   Function: Function;
   If: If;
   Print: Print;
+  Return: Return;
   Let: Let;
   Block: Block;
   RangeFor: RangeFor;
@@ -106,6 +117,7 @@ export const Stmt = {
   Function: functionStmt,
   If: ifexpr,
   Print: print,
+  Return: returnStmt,
   Let: letStmt,
   Block: blockStmt,
   RangeFor: rangeFor,

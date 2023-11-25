@@ -2,6 +2,7 @@ import { Callable } from "../callable";
 import { Stmt } from "../constructs/statements";
 import { Environment } from "../environment";
 import { Interpreter } from "../interpreters/interpreter";
+import { RETURN_EXCEPTION } from "../return";
 import { _EMPTY_FN_RETURN } from "../token";
 
 export class Function extends Callable {
@@ -45,7 +46,15 @@ export class Function extends Callable {
     for (let i = 0; i < this.declaration.params.length; i++) {
       environment.define(this.declaration.params[i].lexeme, _arguments[i]);
     }
-    interpreter.executeBlock(this.declaration.body, environment);
+    try {
+      interpreter.executeBlock(this.declaration.body, environment);
+    } catch (returnValue: any) {
+      if (returnValue.name === RETURN_EXCEPTION) {
+        return returnValue.value;
+      } else {
+        throw returnValue;
+      }
+    }
     return _EMPTY_FN_RETURN;
   }
 

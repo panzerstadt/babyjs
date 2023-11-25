@@ -2,7 +2,7 @@ import { Environment } from "../environment";
 import { RuntimeError } from "../errors";
 import { AnyExpr, Expr } from "../constructs/expressions";
 import { AnyStmt, Stmt } from "../constructs/statements";
-import { Token, _UNINITIALIZED } from "../token";
+import { Token, _EMPTY_FN_RETURN, _UNINITIALIZED } from "../token";
 import { LoggerType, TokenType, assertNever } from "../types";
 import { PrintStyle, printAST } from "./pprinter";
 import { isTruthy } from "../constants";
@@ -10,6 +10,7 @@ import { Callable } from "../callable";
 import { Clock } from "../functions/foreignfunctions/clock";
 import { Ls } from "../functions/foreignfunctions/blogInterface";
 import { Function } from "../functions/basefunction";
+import { Return } from "../return";
 
 const statementIsVariableExpression = (
   statements: AnyStmt[]
@@ -76,6 +77,8 @@ export class Interpreter {
         return this.visitWhileStmt(stmt, debug);
       case "print":
         return this.visitPrintStmt(stmt, debug);
+      case "return":
+        return this.visitReturnStmt(stmt, debug);
       case "function":
         return this.visitFunctionStmt(stmt, debug);
       case "let":
@@ -388,6 +391,15 @@ export class Interpreter {
 
     debug && this.logger.log("Interpreted Output:");
     this.logger.log(">>", safeValue);
+  }
+
+  public visitReturnStmt(stmt: Stmt["Return"], debug?: boolean): void {
+    let value: Object = _EMPTY_FN_RETURN;
+    if (stmt.value !== _EMPTY_FN_RETURN) {
+      value = this.evaluate(stmt.value);
+    }
+
+    throw new Return(value);
   }
 
   public visitFunctionStmt(stmt: Stmt["Function"], debug?: boolean): void {

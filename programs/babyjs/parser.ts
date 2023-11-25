@@ -1,7 +1,7 @@
 import { ParseError } from "./errors";
 import { AnyExpr, Expr } from "./constructs/expressions";
 import { AnyStmt, Stmt } from "./constructs/statements";
-import { Token } from "./token";
+import { Token, _EMPTY_FN_RETURN } from "./token";
 import { LoggerType, TokenType } from "./types";
 import { MAX_PARAMETER_COUNT } from "./constants";
 
@@ -43,6 +43,7 @@ statement      → exprStmt
                | forStmt
                | ifStmt
                | printStmt
+               | returnStmt
                | whileStmt
                | block ;
 
@@ -53,6 +54,7 @@ whileStmt      → "while" "(" expression ")" statement ;
 ifStmt         → "if" "(" expression ")" statement
                  ( "else" statement )? ;
 printStmt      → "print" expression ";" ;   
+returnStmt     → "return" expression? ";" ;
 block          → "{" declaration* "}" ;
 varDecl        → "let" IDENTIFIER ( "=" expression )? ";"
 funDecl        → "fn" function ;
@@ -515,6 +517,17 @@ export class Parser {
     return Stmt.Print(value);
   }
 
+  private returnStatement() {
+    const keyword = this.previous();
+    let value: AnyExpr | typeof _EMPTY_FN_RETURN = _EMPTY_FN_RETURN;
+    if (!this.check(TokenType.SEMICOLON)) {
+      value = this.expression();
+    }
+
+    this.consume(TokenType.SEMICOLON, "Expect ';' after return value");
+    return Stmt.Return(keyword, value);
+  }
+
   private expressionStatement() {
     const expr = this.expression();
     if (!expr) {
@@ -576,6 +589,7 @@ export class Parser {
     if (this.match(TokenType.FOR)) return this.forStatement();
     if (this.match(TokenType.IF)) return this.ifStatement();
     if (this.match(TokenType.PRINT)) return this.printStatement();
+    if (this.match(TokenType.RETURN)) return this.returnStatement();
     if (this.match(TokenType.WHILE)) return this.whileStatement();
     if (this.match(TokenType.LEFT_BRACE)) return Stmt.Block(this.block());
 

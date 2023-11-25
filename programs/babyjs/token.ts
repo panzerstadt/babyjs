@@ -44,6 +44,7 @@ export const keywords = {
   fn: TokenType.FUNC,
   for: TokenType.FOR,
   in: TokenType.IN,
+  return: TokenType.RETURN,
 } as const;
 
 export const accidentalKeywords = {
