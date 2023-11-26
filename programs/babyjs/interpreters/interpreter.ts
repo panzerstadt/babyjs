@@ -403,7 +403,7 @@ export class Interpreter {
   }
 
   public visitFunctionStmt(stmt: Stmt["Function"], debug?: boolean): void {
-    const _function = new Function(stmt);
+    const _function = new Function(stmt, this.environment);
     this.environment.define(stmt.name.lexeme, _function);
   }
 

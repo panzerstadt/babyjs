@@ -801,6 +801,9 @@ describe("babyjs", () => {
       let one = early(1); 
       print one;
 
+      // this is allowed
+      early(2);
+
       // not allowed
       let two = early(2);
       print two;
@@ -812,6 +815,31 @@ describe("babyjs", () => {
         "interpret",
         expect.stringContaining("assigning a function with no return values to a variable")
       );
+    });
+
+    describe("local functions and closures", () => {
+      it("variables in closures should exist", () => {
+        const code = `
+        fn makeCounter() {
+          let i = 0;
+          fn count() {
+            i = i + 1;
+            print i;
+          }
+        
+          return count;
+        }
+        
+        let counter = makeCounter();
+        counter(); // "1".
+        counter(); // "2".`;
+
+        babyjs.runOnce(code);
+
+        expect(logger.error).not.toHaveBeenCalled();
+        expect(logger.log).toHaveBeenNthCalledWith(1, ">>", 1);
+        expect(logger.log).toHaveBeenNthCalledWith(2, ">>", 2);
+      });
     });
   });
 });

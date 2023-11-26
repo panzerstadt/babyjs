@@ -7,8 +7,11 @@ import { _EMPTY_FN_RETURN } from "../token";
 
 export class Function extends Callable {
   private readonly declaration: Stmt["Function"];
-  constructor(declaration: Stmt["Function"]) {
+  private readonly closure: Environment;
+
+  constructor(declaration: Stmt["Function"], closure: Environment) {
     super();
+    this.closure = closure;
     this.declaration = declaration;
   }
 
@@ -23,7 +26,7 @@ export class Function extends Callable {
    * meaning _unitialized
    */
   call(interpreter: Interpreter, _arguments: Object[]): Object {
-    const environment = new Environment(interpreter.globals);
+    const environment = new Environment(this.closure);
     // FIXME: unpack this concept properly in my head
     /**
      * fun count(n) {
@@ -49,6 +52,7 @@ export class Function extends Callable {
     try {
       interpreter.executeBlock(this.declaration.body, environment);
     } catch (returnValue: any) {
+      // unwind call stack from nested function calls
       if (returnValue.name === RETURN_EXCEPTION) {
         return returnValue.value;
       } else {
