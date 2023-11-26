@@ -34,11 +34,40 @@ var result = procedure(); // -> should throw error here
 print result;
 
 // TODO: what about functions with early returns?
-function(a) {
-  if (!a) return // we force the user to return something useful? (needs testing)
-
-  return a + 1
+fn early(num) {
+  if (num != 1) return;
+  return num;
 }
+
+// allowed
+let one = early(1);
+print one;
+
+// this is allowed
+early(2);
+
+// not allowed
+let two = early(2);
+print two;
+
+// closures
+fn makeCounter() {
+  let i = 0;
+  fn count() {
+    i = i + 1;
+    print i;
+  }
+
+  return count;
+}
+
+let counter = makeCounter();
+counter(); // "1".
+counter(); // "2".
+
+
+// TODO: explore this
+// In data structures like trees, linked lists, or optional fields in structures/classes, the absence of a value is traditionally represented by null. Alternative representations might be less efficient or intuitive.
 ```
 
 ## NextJS setup
