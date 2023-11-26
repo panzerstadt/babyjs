@@ -146,6 +146,18 @@ for (let b = 1; a < 10000; b = temp + b) {
   a = b;
 }
 
+// no anonymous functions btw
+fn thrice(param) {
+  for (let i = 1; i <= 3; i = i + 1) {
+    param(i);
+  }
+}
+
+// this will not work
+thrice(fn (a) {
+  print a;
+});
+
 
 // come back from time to time to see this list grow!
 -----------------
