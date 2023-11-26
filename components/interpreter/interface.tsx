@@ -28,7 +28,7 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
   useStd(program, "err", setLines, () => scrollToBottom(), true);
   useStd(program, "info", setLines, () => scrollToBottom(), true);
 
-  const [userHistory, { back, forward, add }] = useHistory();
+  const [userHistory, { back, forward, add, addBatch }] = useHistory();
   useEffect(() => {
     if (!!userHistory) {
       setUserInputBuffer(userHistory);
@@ -53,6 +53,10 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
 
   const handleSetStdout = (newOutput: string, type?: LineType) => {
     setLines((p) => [...p, { type: type ?? "out", value: newOutput }]);
+  };
+
+  const handleSetStdoutBatch = (lines: string[], type?: LineType) => {
+    setLines((p) => [...p, ...lines.map((l) => ({ type: type ?? "out", value: l }))]);
   };
 
   const handleClearStdout = () => {
@@ -146,6 +150,16 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
     scrollToBottom();
   };
 
+  const handleUserPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const data = e.clipboardData.getData("text");
+    const lines = data.split("\n").filter(Boolean);
+
+    handleSetStdoutBatch(lines, "usr-tmp");
+    addBatch(lines);
+
+    e.preventDefault();
+  };
+
   const styles: { [key in LineType]: string } = {
     out: "text-slate-300",
     debug: "text-slate-400",
@@ -199,6 +213,7 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
               ref={cursor}
               onChange={handleUserInput}
               onKeyDown={handleKeydown}
+              onPasteCapture={handleUserPaste}
               className="bg-transparent text-sky-500 w-full outline-none pb-5"
               value={userInputBuffer}
               placeholder=">_"

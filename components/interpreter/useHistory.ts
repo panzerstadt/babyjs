@@ -8,6 +8,10 @@ export const useHistory = () => {
     setViewIdx(null);
     _setLog((p) => [...p, value]);
   };
+  const handleAppendLogMulti = (values: any[]) => {
+    setViewIdx(null);
+    _setLog((p) => [...p, ...values]);
+  };
 
   const back = () => {
     if (log.length === 0) return;
@@ -38,7 +42,7 @@ export const useHistory = () => {
     }
   }, [viewIdx, log]);
 
-  //   console.log(`current change: ${viewIdx}, ${view}, log: [${log}]`);
+  console.log(`current change: ${viewIdx}, ${view}, log: [${log}]`);
 
-  return [view, { back, forward, add: handleAppendLog }] as const;
+  return [view, { back, forward, add: handleAppendLog, addBatch: handleAppendLogMulti }] as const;
 };
