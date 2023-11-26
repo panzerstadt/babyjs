@@ -11,10 +11,7 @@ export const useRedirect = (ref: MutableRefObject<Program | undefined>, newtab?:
   useEffect(() => {
     if (!currentRef) return;
 
-    let path = removeTimestamp(currentRef);
-    if (!path.startsWith("http")) {
-      path = `https://${path}`;
-    }
+    const path = removeTimestamp(currentRef);
     window.open(path, newtab ? "_blank" : "_self");
   }, [currentRef, newtab]);
 };
