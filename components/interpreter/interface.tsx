@@ -160,7 +160,7 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
     <Container
       key="terminal-container"
       bgColor="bg-stone-200"
-      roundedClass="rounded-lg"
+      roundedClass="rounded-xl"
       distance={5}
       bordered
     >
