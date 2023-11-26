@@ -8,7 +8,7 @@ import { PrintStyle, printAST } from "./pprinter";
 import { isTruthy } from "../constants";
 import { Callable } from "../callable";
 import { Clock } from "../functions/foreignfunctions/clock";
-import { Ls } from "../functions/foreignfunctions/blogInterface";
+import { Ls, Visit } from "../functions/foreignfunctions/blogInterface";
 import { Function } from "../functions/basefunction";
 import { Return } from "../return";
 
@@ -26,12 +26,13 @@ export class Interpreter {
   private loop_upper_bound = 10_000;
   readonly globals = new Environment();
   private environment = this.globals;
-  logger: Console | LoggerType = console;
+  logger: LoggerType = console;
 
   constructor() {
     // FFI (this is where we allow the users to work with files, read user input etc)
     this.globals.define("clock", new Clock());
     this.globals.define("ls", new Ls());
+    this.globals.define("visit", new Visit());
   }
 
   public setLogger(newLogger: LoggerType) {

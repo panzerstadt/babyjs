@@ -75,6 +75,7 @@ export interface LoggerType {
   error: (phase: Phase, str: string) => void;
   debug?: (phase: Phase, ...strs: string[]) => void;
   environment?: (...strs: string[]) => void;
+  visit?: (str: string) => void;
 }
 
 export type Phase = "scan" | "parse" | "interpret";

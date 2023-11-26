@@ -12,6 +12,8 @@ export class Program {
   stddebug = "";
   stdenv = "";
 
+  urlredirect = "";
+
   constructor() {
     this.interpreter = new BabyJs();
     this.interpreter.setLogger(this.output());
@@ -59,6 +61,9 @@ export class Program {
           .flat(5)
           .map((s) => `${this.timestamp()}:${phase}:${s}\n`)
           .join("");
+      },
+      visit: (url: string) => {
+        this.urlredirect = `${this.timestamp()}:${url}`;
       },
     };
   }
@@ -157,6 +162,11 @@ fn thrice(param) {
 thrice(fn (a) {
   print a;
 });
+
+// you might have also realised.. uh.. there are no:
+- arrays
+- objects
+- classes (yet)
 
 
 // come back from time to time to see this list grow!

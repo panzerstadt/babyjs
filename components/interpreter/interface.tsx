@@ -4,6 +4,7 @@ import { useHistory } from "./useHistory";
 import { Tips } from "./tips";
 import { useStd } from "./useStd";
 import { Container } from "../terminals/Neumorphic/Container";
+import { useRedirect } from "./useRedirect";
 
 export type Line = { type: LineType; value: string };
 type LineType = StdEnvs | "usr" | "usr-tmp";
@@ -27,6 +28,7 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
   useStd(program, "debug", setLines, () => scrollToBottom()); // vvvv
   useStd(program, "err", setLines, () => scrollToBottom(), true);
   useStd(program, "info", setLines, () => scrollToBottom(), true);
+  useRedirect(program, true);
 
   const [userHistory, { back, forward, add, addBatch }] = useHistory();
   useEffect(() => {
