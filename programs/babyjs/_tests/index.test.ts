@@ -14,6 +14,28 @@ describe("babyjs", () => {
     }),
   };
 
+  const this_code = (code: string) => {
+    babyjs.runOnce(code);
+    return {
+      shouldWork: () => {
+        expect(logger.error).not.toHaveBeenCalled();
+        expect(logger.log).not.toHaveBeenCalled();
+      },
+      shouldPrint: (output: any) => {
+        expect(logger.error).not.toHaveBeenCalled();
+        expect(logger.log).toHaveBeenLastCalledWith(">>", output);
+      },
+      shouldErrorAtRuntimeMentioning: (str: string) => {
+        expect(logger.log).not.toHaveBeenCalled();
+        expect(logger.error).toHaveBeenCalledWith("interpret", expect.stringContaining(str));
+      },
+      shouldErrorAtScantimeMentioning: (str: string) => {
+        expect(logger.log).not.toHaveBeenCalled();
+        expect(logger.error).toHaveBeenCalledWith("scan", expect.stringContaining(str));
+      },
+    };
+  };
+
   beforeEach(() => {
     logger.log.mockClear();
     logger.error.mockClear();
@@ -22,188 +44,51 @@ describe("babyjs", () => {
     babyjs = new BabyJs();
     babyjs.setLogger(logger);
   });
+
   it("works", () => {
-    const code = `let test = "hello world";`;
-    babyjs.runOnce(code);
-    expect(logger.log).not.toHaveBeenCalled();
-    expect(logger.error).not.toHaveBeenCalled();
+    this_code(`let test = "hello world";`).shouldWork();
   });
 
+  // prettier-ignore
   describe("debug mode works", () => {
-    it("works with expressions", () => {
-      const code = "1+2;";
-      babyjs.runOnce(code, true);
-      expect(logger.error).not.toHaveBeenCalled();
-    });
-    it("works with assignments", () => {
-      const code = "let a;";
-      babyjs.runOnce(code, true);
-      expect(logger.error).not.toHaveBeenCalled();
-    });
-    it("works with block scoping", () => {
-      const code = "let a; { let a = 10; print a; } a = 5; print a;";
-      babyjs.runOnce(code, true);
-      expect(logger.error).not.toHaveBeenCalled();
-    });
+    it("works with expressions", () => this_code("1+2;").shouldWork());
+    it("works with assignments", () => this_code("let a;").shouldWork());
+    it("works with block scoping", () => this_code("let a; { let a = 10; print a; } a = 5; print a;").shouldPrint(5));
   });
 
-  it("print works", () => {
-    const code = `print 1;`;
-    babyjs.runOnce(code);
+  it("print works", () => this_code("print 1;").shouldPrint(1));
 
-    expect(logger.log).toHaveBeenCalledWith(">>", 1);
-  });
-
+  // prettier-ignore
   describe("expressions", () => {
-    it("evaluates simple expressions", () => {
-      const code = `print 1+2;`;
-      babyjs.runOnce(code);
-
-      expect(logger.log).toHaveBeenCalledWith(">>", 3);
-    });
-    it("evaluates complex expressions", () => {
-      const code = `print ((1 / 5 + 4) / 5 + 0.2);`;
-      babyjs.runOnce(code);
-
-      expect(logger.log).toHaveBeenCalledWith(">>", 1.04);
-    });
-    it("evaluates pi", () => {
-      const code = `print 22/7;`;
-      babyjs.runOnce(code);
-
-      expect(logger.log).toHaveBeenCalledWith(">>", 3.142857142857143);
-    });
-    it("performs comparisons", () => {
-      const code = `print 1 == 1;`;
-      babyjs.runOnce(code);
-
-      expect(logger.log).toHaveBeenCalledWith(">>", true);
-    });
-    it("does not typecast in comparisons (similar to js strict equality 'a === b')", () => {
-      const code = `print 1 == "1";`;
-      babyjs.runOnce(code);
-
-      expect(logger.log).toHaveBeenCalledWith(">>", false);
-    });
-    it("should not divide by zero", () => {
-      const code = `print 1 / 0;`;
-      babyjs.runOnce(code);
-
-      expect(logger.log).not.toHaveBeenCalled();
-      expect(logger.error).toHaveBeenCalledWith(
-        "interpret",
-        expect.stringContaining("divide by zero")
-      );
-    });
+    it("evaluates simple expressions", () => this_code("print 1+2;").shouldPrint(3));
+    it("evaluates complex expressions", () => this_code("print ((1 / 5 + 4) / 5 + 0.2);").shouldPrint(1.04));
+    it("evaluates pi", () => this_code("print 22/7;").shouldPrint(3.142857142857143));
+    it("performs comparisons", () => this_code("print 1==1;").shouldPrint(true));
+    it("does not typecast in comparisons (similar to js strict equality 'a === b')", () => this_code(`print 1=="1";`).shouldPrint(false));
+    it("should not divide by zero", () => this_code("print 1/0;").shouldErrorAtRuntimeMentioning("divide by zero"));
   });
 
+  // prettier-ignore
   describe("let", () => {
-    it("does not identify 'nil' as a reserved word. (it was in lox. is removed in babyjs)", () => {
-      const code = `let one = nil;print one;`;
-      babyjs.runOnce(code);
+    it("does not identify 'nil' as a reserved word. (it was in lox. is removed in babyjs)", () => this_code(`let one = nil;print one;`).shouldErrorAtRuntimeMentioning("Undefined variable 'nil'"));
+    it("cannot store nullish values: null (js:leaky)", () => this_code("let one = null;print one;").shouldErrorAtScantimeMentioning("SCAN ERROR"));
+    // undefined is not a reserved word in babyjs, so it should be treated as an identifier.
+    it("cannot store nullish values: undefined (js:leaky)", () => this_code(`let one = undefined;print one;`).shouldErrorAtRuntimeMentioning("Undefined variable 'undefined'"));
+    
+    it("stores number", () => this_code(`let one = 1;print one;`).shouldPrint(1));
+    it("stores number (nullish values: 0)", () => this_code(`let zero = 0;print zero;`).shouldPrint(0));
+    it("stores boolean", () => this_code(`let zero = true;print zero;`).shouldPrint(true));
+    it("stores boolean (nullish values: false)", () => this_code(`let zero = false;print zero;`).shouldPrint(false));
 
-      expect(logger.error).toHaveBeenCalledWith(
-        "interpret",
-        expect.stringContaining("Undefined variable 'nil'")
-      );
-      expect(logger.log).not.toHaveBeenCalled();
-    });
-    it("cannot store nullish values: null (js:leaky)", () => {
-      const code = `let one = null;print one;`;
-      babyjs.runOnce(code);
+    it("errors when user tries to redeclare a variable", () => this_code(`let one = 2; let one = 1;`).shouldErrorAtRuntimeMentioning("Variable has already been defined"));
+    it("errors when user tries to redeclare a variable (nullish values)", () => this_code(`let one = 0; let one = 1;`).shouldErrorAtRuntimeMentioning("Variable has already been defined"));
 
-      expect(logger.error).toHaveBeenCalledWith("scan", expect.stringContaining("SCAN ERROR"));
-      expect(logger.log).not.toHaveBeenCalled();
-    });
-    it("cannot store nullish values: undefined (js:leaky)", () => {
-      // undefined is not a reserved word in babyjs, so it should be treated as an identifier.
-      const code = `let one = undefined;print one;`;
-      babyjs.runOnce(code);
+    it("reassigns number", () => this_code("let one = 1;one = 2;print one;").shouldPrint(2));
+    it("reassigns number (nullish values)", () => this_code("let one = 0;one = 2;print one;").shouldPrint(2));
 
-      expect(logger.error).toHaveBeenCalledWith(
-        "interpret",
-        expect.stringContaining("Undefined variable 'undefined'")
-      );
-      expect(logger.log).not.toHaveBeenCalled();
-    });
-    it("stores number", () => {
-      const code = `let one = 1;print one;`;
-      babyjs.runOnce(code);
-
-      expect(logger.log).toHaveBeenCalledWith(">>", 1);
-    });
-    it("stores number (nullish values: 0)", () => {
-      const code = `let one = 0;print one;`;
-      babyjs.runOnce(code);
-
-      expect(logger.log).toHaveBeenCalledWith(">>", 0);
-    });
-    it("stores boolean", () => {
-      const code = `let one = true;print one;`;
-      babyjs.runOnce(code);
-
-      expect(logger.log).toHaveBeenCalledWith(">>", true);
-    });
-    it("stores boolean (nullish values: false)", () => {
-      const code = `let one = false;print one;`;
-      babyjs.runOnce(code);
-
-      expect(logger.error).not.toHaveBeenCalled();
-      expect(logger.log).toHaveBeenCalledWith(">>", false);
-    });
-
-    it("errors when user tries to redeclare a variable", () => {
-      const code = `let one = 2; let one = 1;`;
-      babyjs.runOnce(code);
-
-      expect(logger.error).toHaveBeenCalledWith(
-        "interpret",
-        expect.stringContaining("Variable has already been defined")
-      );
-      expect(logger.log).not.toHaveBeenCalled();
-    });
-    it("errors when user tries to redeclare a variable (nullish values)", () => {
-      const code = `let one = 0; let one = 1;`;
-      babyjs.runOnce(code);
-
-      expect(logger.error).toHaveBeenCalledWith(
-        "interpret",
-        expect.stringContaining("Variable has already been defined")
-      );
-      expect(logger.log).not.toHaveBeenCalled();
-    });
-
-    it("reassigns number", () => {
-      const code = `let one = 1;one = 2;print one;`;
-      babyjs.runOnce(code);
-
-      expect(logger.log).toHaveBeenCalledWith(">>", 2);
-    });
-    it("reassigns number (nullish values)", () => {
-      const code = `let one = 0;one = 2;print one;`;
-      babyjs.runOnce(code);
-
-      expect(logger.log).toHaveBeenCalledWith(">>", 2);
-    });
-
-    it("stores string", () => {
-      const code = `let one = "foo";print one;`;
-      babyjs.runOnce(code);
-
-      expect(logger.log).toHaveBeenCalledWith(">>", "foo");
-    });
-    it(`stores string (nullish values: "")`, () => {
-      const code = `let one = "";print one;`;
-      babyjs.runOnce(code);
-
-      expect(logger.log).toHaveBeenCalledWith(">>", "");
-    });
-    it("evaluates and stores expression", () => {
-      const code = `let one = 1+2;print one;`;
-      babyjs.runOnce(code);
-
-      expect(logger.log).toHaveBeenCalledWith(">>", 3);
-    });
+    it("stores string", () => this_code(`let one = "foo";print one;`).shouldPrint("foo"));
+    it(`stores string (nullish values: "")`, () => this_code(`let one = "";print one;`).shouldPrint(""));
+    it("evaluates and stores expression", () => this_code(`let one = 1+2;print one;`).shouldPrint(3));
 
     it.skip("warns on reassignments", () => {
       const code = `let one = 1;one = 2;`;
@@ -215,24 +100,10 @@ describe("babyjs", () => {
     });
   });
 
+  // prettier-ignore
   describe("variable assignment", () => {
-    it("works", () => {
-      const code = `let a = 10; a = 20; print a;`;
-      babyjs.runOnce(code, true);
-
-      expect(logger.error).not.toHaveBeenCalled();
-      expect(logger.log).toHaveBeenCalledWith(">>", 20);
-    });
-    it("does not allow accessing unassigned variables at runtime", () => {
-      const code = `let a; print a;`;
-      babyjs.runOnce(code);
-
-      expect(logger.error).toHaveBeenCalledWith(
-        "interpret",
-        expect.stringContaining("used before assignment")
-      );
-      expect(logger.log).not.toHaveBeenCalled();
-    });
+    it("works", () => this_code(`let a = 10; a = 20; print a;`).shouldPrint(20));
+    it("does not allow accessing unassigned variables at runtime", () => this_code(`let a; print a;`).shouldErrorAtRuntimeMentioning("used before assignment"));
   });
 
   describe("error handling", () => {
