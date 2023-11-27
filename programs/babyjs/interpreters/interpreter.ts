@@ -11,6 +11,7 @@ import { Clock } from "../functions/foreignfunctions/clock";
 import { Ls, Visit } from "../functions/foreignfunctions/blogInterface";
 import { Function } from "../functions/basefunction";
 import { Return } from "../return";
+import { Async } from "../functions/foreignfunctions/dummyasync";
 
 const statementIsVariableExpression = (
   statements: AnyStmt[]
@@ -33,6 +34,7 @@ export class Interpreter {
     this.globals.define("clock", new Clock());
     this.globals.define("ls", new Ls());
     this.globals.define("visit", new Visit());
+    this.globals.define("async", new Async());
   }
 
   public setLogger(newLogger: LoggerType) {
