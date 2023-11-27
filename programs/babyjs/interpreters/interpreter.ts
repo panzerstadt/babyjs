@@ -12,6 +12,7 @@ import { Ls, Visit } from "../functions/foreignfunctions/blogInterface";
 import { Function } from "../functions/basefunction";
 import { Return } from "../return";
 import { Async } from "../functions/foreignfunctions/dummyasync";
+import { Csv, Review } from "../functions/foreignfunctions/csv";
 
 const statementIsVariableExpression = (
   statements: AnyStmt[]
@@ -35,6 +36,8 @@ export class Interpreter {
     this.globals.define("ls", new Ls());
     this.globals.define("visit", new Visit());
     this.globals.define("async", new Async());
+    this.globals.define("csv", new Csv());
+    this.globals.define("review", new Review());
   }
 
   public setLogger(newLogger: LoggerType) {
