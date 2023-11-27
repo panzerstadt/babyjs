@@ -56,6 +56,19 @@ export class Function extends Callable {
       if (returnValue.name === RETURN_EXCEPTION) {
         return returnValue.value;
       } else {
+        /**
+         * turns out this is something that some programming languages haven't really solved without
+         * using throw.
+         *
+         * the equivalent of something that needs to properly return stack by stack is....
+         * Callbacks! (js callbacks)
+         * this is what happens when you need to pass the result from an
+         * asynchronous process, because otherwise the machine has already
+         * moved on and gone on to do other stuff
+         *
+         * TODO: learn how async/await is implemented
+         * TODO: try supporting callback hell in my language! it might be easier than i might think.
+         */
         throw returnValue;
       }
     }
