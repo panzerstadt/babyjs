@@ -1,0 +1,143 @@
+import Head from "next/head";
+import "reactflow/dist/style.css";
+import { useCallback } from "react";
+
+import ReactFlow, {
+  Background,
+  Controls,
+  Edge,
+  MiniMap,
+  Node,
+  addEdge,
+  useEdgesState,
+  useNodesState,
+  NodeToolbar,
+  DefaultEdgeOptions,
+  Position,
+  Connection,
+} from "reactflow";
+import { MonitorNode } from "./components/Nodes/monitorNode";
+import { SimpleNode } from "./components/Nodes/simpleNode";
+import { NODE_TYPE } from "./components/Nodes/types";
+import { posX, posY } from "./components/Nodes/utils";
+import { connect } from "./components/Edges";
+import { mainRouter, subnetRouter } from "./constants/gateways";
+import { ceph, edgev, liva, npir5s, reserver, rp48g, zimaboard } from "./constants/devices";
+import { VirtualNode } from "./components/Nodes/virtualNode";
+import { DagDogNode } from "./components/Nodes/dagdogNode";
+
+const defaultEdgeOptions: DefaultEdgeOptions = { animated: true };
+const defaultNodeOptions: Partial<Node> = {
+  sourcePosition: Position.Right,
+  targetPosition: Position.Left,
+};
+
+// mapp
+const customNodeSelectors = {
+  monitor: MonitorNode,
+  simple: SimpleNode,
+  virtual: VirtualNode,
+  dagdog: DagDogNode,
+  // TODO: processor node
+};
+
+// prettier-ignore
+const initialNodes: Node[] = [
+  { id: "internet", position: { x: posX(-2.75), y: posY() }, data: { type: NODE_TYPE.START, label: "Init" }, type: "dagdog" },
+  { id: "main-router", position: { x: posX(-0.5), y: posY() }, data: { type: NODE_TYPE.MIDDLE, ...mainRouter }, type: "dagdog" },
+  { id: "subnet-router", position: { x: posX(2), y: posY() }, data: { type: NODE_TYPE.MIDDLE, ...subnetRouter }, type: "monitor" },
+  // slate ax
+  { id: 'nanopi-r5s', position: { x: posX(2), y: posY(2) }, data: { type: NODE_TYPE.MIDDLE, ...npir5s }, type: "monitor" },
+  { id: "edge-v", position: { x: posX(3), y: posY() }, data: { type: NODE_TYPE.END, ...edgev }, type: "monitor" },
+  { id: "zimaboard", position: { x: posX(3), y: posY(1) }, data: { type: NODE_TYPE.MIDDLE, ...zimaboard }, type: "monitor" },
+  { id: "re-server", position: { x: posX(3), y: posY(2) }, data: { type: NODE_TYPE.MIDDLE, ...reserver }, type: "monitor" },
+  { id: "liva", position: { x: posX(3), y: posY(3) }, data: { type: NODE_TYPE.MIDDLE, ...liva }, type: "monitor" },
+  { id: "ceph", position: { x: posX(4), y: posY(1) }, data: { type: NODE_TYPE.END, ...ceph }, type: "virtual" },
+  { id: "rp4-8g", position: { x: posX(3), y: posY(4) }, data: { type: NODE_TYPE.END, ...rp48g }, type: "monitor" },
+  { id: "ha-yellow", position: { x: posX(3), y: posY(5) }, data: { type: NODE_TYPE.END, label: "Home Assistant Yellow", enabled: false }, type: "monitor" },
+  // home wifi
+  { id: "cm3-master", position: { x: posX(2), y: posY(2, 110) }, data: { type: NODE_TYPE.END, label: "Radxa CM3 Cluster (control node)", enabled: false }, type: "monitor" },
+  { id: "cm3-slave-1", position: { x: posX(2), y: posY(3, 110) }, data: { type: NODE_TYPE.END, label: "Radxa CM3 Cluster (worker node 1)", enabled: false }, type: "monitor" },
+  { id: "cm3-slave-2", position: { x: posX(2), y: posY(4, 110) }, data: { type: NODE_TYPE.END, label: "Radxa CM3 Cluster (worker node 2)", enabled: false }, type: "monitor" },
+  { id: "lattepanda", position: { x: posX(2), y: posY(5, 110) }, data: { type: NODE_TYPE.END, label: "LattePanda", enabled: false }, type: "monitor" },
+  { id: "rzero", position: { x: posX(2), y: posY(6, 110) }, data: { type: NODE_TYPE.END, label: "Radxa Zero", enabled: false }, type: "monitor" },
+].map((n) => ({ ...defaultNodeOptions, ...n }));
+
+const initialEdges: Edge[] = [
+  connect("internet", "main-router"),
+  connect("main-router", "subnet-router"),
+  // slate ax
+  connect("subnet-router", "edge-v"),
+  connect("subnet-router", "nanopi-r5s"),
+  connect("nanopi-r5s", "zimaboard"),
+  connect("nanopi-r5s", "re-server"),
+  connect("subnet-router", "zimaboard"),
+  connect("subnet-router", "re-server"),
+  connect("subnet-router", "liva"),
+  connect("zimaboard", "ceph"),
+  connect("re-server", "ceph"),
+  connect("liva", "ceph"),
+  connect("subnet-router", "rp4-8g"),
+  connect("subnet-router", "ha-yellow", false),
+  // home wifi
+  connect("main-router", "cm3-master", false),
+  connect("main-router", "cm3-slave-1", false),
+  connect("main-router", "cm3-slave-2", false),
+  connect("main-router", "lattepanda", false),
+  connect("main-router", "rzero", false),
+];
+
+export const Aether = () => {
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+
+  const onConnect = useCallback(
+    (connection: Connection) => setEdges((eds) => addEdge(connection, eds)),
+    [setEdges]
+  );
+
+  // TODO: add Nodes = create new function / microservice
+  //   const handleAddNodes = () => {
+  //     setNodes({ label: "hello", position: { x: 1, y: 1 } });
+  //   };
+
+  return (
+    <>
+      <Head>
+        <title>DagDog</title>
+        <meta name="description" content="Generated by create next app" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      <div className="w-sceen h-screen bg-gray-50">
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          defaultEdgeOptions={defaultEdgeOptions}
+          nodeTypes={customNodeSelectors}
+          fitView={true}
+        >
+          <MiniMap nodeColor={(node) => nodeColor(node.data)} nodeStrokeWidth={3} pannable />
+          <Controls />
+          <Background color="#4C3B4D" />
+        </ReactFlow>
+      </div>
+    </>
+  );
+};
+
+const nodeColor = (nodeData: Node["data"]) => {
+  switch (nodeData.type) {
+    case "input":
+      return "#A53860";
+    case "processor":
+      return "#4C3B4D";
+    case "output":
+      return "#61C9A8";
+    default:
+      return "#ADA8B6";
+  }
+};
