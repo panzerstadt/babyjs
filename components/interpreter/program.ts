@@ -1,9 +1,11 @@
+import { DagDog } from "@/programs/dagdog/dagdog";
 import { BabyJs } from "../../programs/babyjs/babyjs";
 import { LoggerType, Phase } from "../../programs/babyjs/types";
 
-type Interpreter = BabyJs;
+type Interpreter = BabyJs | DagDog;
 const interpreters = {
   babyjs: BabyJs,
+  dagdog: DagDog,
 };
 export type Language = keyof typeof interpreters;
 
