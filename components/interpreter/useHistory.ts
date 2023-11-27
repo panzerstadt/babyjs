@@ -42,7 +42,7 @@ export const useHistory = () => {
     }
   }, [viewIdx, log]);
 
-  console.log(`current change: ${viewIdx}, ${view}, log: [${log}]`);
+  // console.log(`current change: ${viewIdx}, ${view}, log: [${log}]`);
 
   return [view, { back, forward, add: handleAppendLog, addBatch: handleAppendLogMulti }] as const;
 };
