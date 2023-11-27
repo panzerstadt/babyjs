@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Program, StdEnvs } from "./program";
+import { Language, Program, StdEnvs } from "./program";
 import { useHistory } from "./useHistory";
 import { Tips } from "./tips";
 import { useStd } from "./useStd";
@@ -9,21 +9,24 @@ import { useRedirect } from "./useRedirect";
 export type Line = { type: LineType; value: string };
 type LineType = StdEnvs | "usr" | "usr-tmp";
 const TABS = 4;
-const INTRO_LINE: Line = { type: "out", value: "Hello there. type 'help' for a nice intro." };
+const makeIntro: (lang: Language) => Line = (lang) => ({
+  type: "out",
+  value: `Hello there, I'm ${lang}! Type 'help' for a nice intro.`,
+});
 
 interface InterpreterProps {
-  multiTerminal?: boolean;
+  lang: Language;
   focus?: number; // a random number to trigger a useEffect dep
   onResult?: () => void; // pipe out
 }
-export const Interpreter: React.FC<InterpreterProps> = ({ focus }) => {
+export const Interpreter: React.FC<InterpreterProps> = ({ focus, lang }) => {
   const cursor = useRef<HTMLInputElement>(null);
   const program = useRef<Program>();
 
   const [userInputBuffer, setUserInputBuffer] = useState("");
-  const [lines, setLines] = useState<Line[]>([INTRO_LINE]);
+  const [lines, setLines] = useState<Line[]>([makeIntro(lang)]);
 
-  useEffect(() => { program.current = new Program() }, []); // prettier-ignore
+  useEffect(() => { program.current = new Program(lang) }, [lang]); // prettier-ignore
   useStd(program, "out", setLines, () => scrollToBottom());
   useStd(program, "debug", setLines, () => scrollToBottom()); // vvvv
   useStd(program, "err", setLines, () => scrollToBottom(), true);

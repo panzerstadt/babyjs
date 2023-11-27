@@ -9,7 +9,7 @@ export default function Home() {
       className={`flex min-h-screen flex-col items-center justify-center px-4 sm:px-24 ${inter.className}`}
     >
       <div className="h-[80dvh] w-full">
-        <Interpreter />
+        <Interpreter lang="babyjs" />
       </div>
     </main>
   );

@@ -1,11 +1,17 @@
 import { BabyJs } from "../../programs/babyjs/babyjs";
 import { LoggerType, Phase } from "../../programs/babyjs/types";
 
+type Interpreter = BabyJs;
+const interpreters = {
+  babyjs: BabyJs,
+};
+export type Language = keyof typeof interpreters;
+
 export type StdEnvs = "out" | "err" | "info" | "debug" | "env";
 
 export class Program {
   verbose = false;
-  interpreter: BabyJs;
+  interpreter: Interpreter;
   stdout = "";
   stderr = "";
   stdinfo = "";
@@ -14,8 +20,9 @@ export class Program {
 
   urlredirect = "";
 
-  constructor() {
-    this.interpreter = new BabyJs();
+  constructor(lang: Language = "babyjs") {
+    const Intr = interpreters[lang];
+    this.interpreter = new Intr();
     this.interpreter.setLogger(this.output());
   }
 
