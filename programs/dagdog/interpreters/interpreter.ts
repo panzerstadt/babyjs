@@ -12,7 +12,7 @@ import { Ls, Visit } from "../functions/foreignfunctions/blogInterface";
 import { Function } from "../functions/basefunction";
 import { Return } from "../return";
 import { Async } from "../functions/foreignfunctions/dummyasync";
-import { Csv, Review, Skim } from "../functions/foreignfunctions/csv";
+import { Csv, Review } from "../functions/foreignfunctions/csv";
 
 const statementIsVariableExpression = (
   statements: AnyStmt[]
