@@ -49,11 +49,68 @@ it kinda seems like there are tradeoffs around the axes of:
 - scale of async-ness (ms/seconds vs minutes/hours)
 - goals (optimizing response times / resource usage vs organizing sequences of tasks at a higher level)
 
+### what it boils down to
+
+is something my colleague calls 'intent driven development'.
+
+it is the "what is the most intuitive way to deal with async work in **\_\_**? "
+
+for example:
+
+- the web browser: async work comes in the form of discrete events from users, that the program has to react to.
+  - user events are async. dealing with events is the way to map async work to logic -> event driven programming
+- the backend:
+  - i'm biased, so i'm gonna say events again. every request is an event that is to be handled. but here, and also usually in the browser, this 'handling' is a bit too big, and does require some async work inside the event itself. so we add another layer of async work (fetching, file reading, )
+
+so in this respect, event driven programming is too broad to full describe what one does when handling user events. they represent the main 'group of work', but the 'unit of work' still needs to be defined.
+
+LARGE: there are large scale async types work
+
+- what DAGs purport to solve, chaining long running methods together through a dependency chain
+  - kinda like when an API relies on another API which relies on another API, but with more observability
+- technically because time doesn't stop for sync programs, all work is async work
+
+MID: there are two types of "groups of work" methods then:
+
+- event driven (event handlers and such) (its.. pubsub?)
+  - user event handlers (click events)
+  - db event handlers (firebase events)
+- coroutines?
+  - firing off subroutines and either waiting for the results or not waiting
+
+SMALL: then there are "units of work" that are done with:
+
+- async await
+- continuation-passing style (CPS) (its callbacks, but in old programmer speak)
+  - where the special case is: promises and callbacks / thenables
+
+#### there are things that...
+
+- you fire off to do stuff and you dont care what happens: async workers / tasks / job scheduling
+  - go: goroutines without waiting
+  - js: running async workers without waiting for it to finish (but of course, we still)
+- you fire off, but want to wait for results before doing something else: chaining logic
+- you receive from somewhere in the ether (internet / streams / queues) that you need to deal with
+
 ### scale vs DAGs
 
 In asynchronous programming, we're often dealing with I/O operations, API calls, or short-lived computational tasks. DAG workflows deal with larger tasks, which might be entire programs, scripts, or lengthy data processing jobs.
 
 hmm i mean.. first class language support for DAGs would be cool tho. what would it look like?
+
+### convo
+
+so it's sorta varying degrees of control as to when to split the program control flow, as well as the interfaces used to join them back / block the control flow until a result comes back
+
+> how much abstraction is exposed by the language huh
+
+and then there's
+
+- event loops, splitting tasks and polling for results until it comes back
+- job scheduling, goroutines just spawn virtual threads
+- actual cpu threads
+
+can't find other types yet
 
 ## chat
 
