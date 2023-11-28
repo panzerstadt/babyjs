@@ -48,7 +48,10 @@ export const keywords = {
 } as const;
 
 export const accidentalKeywords = {
-  null: "You're trying to use a Javascript 'null'. in BabyJS the concept of 'null' has been banned. try setting a sensible default value instead.",
+  null: "It seems like you're trying to use a Javascript 'null'. in BabyJS the concept of 'null' has been banned. try setting a sensible default value instead.",
+  var: "Did you mean 'let'? e.g. let a = 1;",
+  const: "Did you mean 'let'? e.g. let a = 1;",
+  function: "Did you mean 'fn'? this is how we write a function: fn() {}",
 } as const;
 
 export const _UNINITIALIZED = Symbol("uninitialized"); // sentinel value
