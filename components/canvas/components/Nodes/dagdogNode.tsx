@@ -1,10 +1,8 @@
 import { memo } from "react";
-import { getHealthColor, useHealthCheck } from "../useHealthCheck";
 import { Position } from "reactflow";
-import { nodeColor } from "./utils";
 import { SimpleHandle } from "../Handles";
 import { NODE_TYPE } from "./types";
-import { Interpreter } from "@/components/interpreter/interface";
+import { Editor } from "@/components/interpreter/interface";
 
 export interface SimpleNodeData {
   type: NODE_TYPE;
@@ -30,7 +28,8 @@ export const DagDogNode = memo<{ data: any; isConnectable: boolean }>(({ data, i
         <SimpleHandle type="source" position={Position.Right} isConnectable={isConnectable} />
       )}
       <div className="text-xs text-gray-800">{data.label}</div>
-      <Interpreter lang="dagdog" />
+      {/* <Repl lang="dagdog" /> */}
+      <Editor lang="dagdog" />
       {/* <input className="nodrag" type="color" onChange={data.onChange} defaultValue={data.color} /> */}
     </div>
   );

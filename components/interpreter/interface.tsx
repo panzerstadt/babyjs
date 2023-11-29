@@ -14,12 +14,12 @@ const makeIntro: (lang: Language) => Line = (lang) => ({
   value: `Hello there, I'm ${lang}! Type 'help' for a nice intro.`,
 });
 
-interface InterpreterProps {
+interface ReplProps {
   lang: Language;
   focus?: number; // a random number to trigger a useEffect dep
   onResult?: () => void; // pipe out
 }
-export const Interpreter: React.FC<InterpreterProps> = ({ focus, lang }) => {
+export const Repl: React.FC<ReplProps> = ({ focus, lang }) => {
   const cursor = useRef<HTMLInputElement>(null);
   const program = useRef<Program>();
 
@@ -246,5 +246,79 @@ export const Interpreter: React.FC<InterpreterProps> = ({ focus, lang }) => {
         </div>
       </div>
     </Container>
+  );
+};
+
+interface EditorProps {
+  lang: Language;
+  focus?: number; // a random number to trigger a useEffect dep
+}
+
+export const Editor: React.FC<EditorProps> = ({ focus, lang }) => {
+  const cursor = useRef<HTMLInputElement>(null);
+  const program = useRef<Program>();
+  const [lines, setLines] = useState<Line[]>([]);
+  useEffect(() => { program.current = new Program(lang) }, [lang]); // prettier-ignore
+  useStd(program, "out", setLines, () => scrollToBottom());
+
+  const scrollToBottom = () => {
+    // @ts-ignore
+    cursor.current?.scrollIntoView({ behavior: "instant", block: "end", inline: "nearest" });
+  };
+
+  const [input, setInput] = useState("");
+  const handleUpdateInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(e.target.value);
+  };
+  const handleSetStdout = (newOutput: string, type?: LineType) => {
+    setLines((p) => [...p, { type: type ?? "out", value: newOutput }]);
+  };
+
+  const handleSendCode = () => {
+    // interpret
+    const result = program.current?.input(input);
+    result && handleSetStdout(result);
+
+    scrollToBottom();
+  };
+
+  return (
+    <div className="flex flex-col">
+      <Container
+        key="terminal-container"
+        bgColor="bg-stone-200"
+        roundedClass="rounded-xl"
+        distance={5}
+        bordered
+      >
+        <div className="bg-slate-900 h-full relative text-red-500">
+          <textarea
+            onChange={handleUpdateInput}
+            rows={10}
+            className="h-full w-full bg-slate-900 p-3 text-white font-mono"
+          ></textarea>
+          <button
+            onClick={() => handleSendCode()}
+            className="absolute bottom-2 right-2 text-sky-400 text-[10px] px-2 border border-sky-800 hover:bg-sky-400 hover:text-white rounded-md"
+          >
+            send
+          </button>
+        </div>
+      </Container>
+      <div ref={cursor} className="h-8">
+        {lines.map((s, i) => {
+          return (
+            <code
+              key={i}
+              className={`
+              hover:bg-slate-800
+                animate-fade whitespace-break-spaces`}
+            >
+              {s.value}
+            </code>
+          );
+        })}
+      </div>
+    </div>
   );
 };
