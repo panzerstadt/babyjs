@@ -72,6 +72,29 @@ one of the biggest headaches of running microservices (or anything over the netw
 
 maybe that's where dagdog needs to be helpful!
 
+# what benefits can we bring into the language level that can't be had at service/library level (airflow)
+
+perhaps a unified interface, a 'one and only one way to do it' rigour in working with async code
+
+perhaps extensibility. with first class support for DAGs, we take async concerns away from the function itself, but enforce a higher-level view (graph view) of the code when thinking about async code. at local scale, the code graph 'just works as if it were on a DAG', giving maximum debuggability. then when more power is needed, this level of abstraction doesn't need to change, we would just swap out the 'threads/chunks of code' that are run locally with microservices in the cloud, through an api. this allows us to debug async code locally, and get quick feedback (getting control locally also means you get to chaos engineer your 'network' to test out scenarios)
+
+could autoscaling be a language concern? since the interpreter now knows what functions are running too slow and where all the 'subprogram' boundaries are, could it automatically scale up / scale out the function?
+
+also wouldn't a dag-backed language be a perfect fit for implementing recursion? e.g. a quicksort. but this isn't about async handling anymore, so its more of a bonus side effect
+
 # hey smalltalk vibes!
 
 i guess, i read like a tiny excerpt of what smalltalk conceptually is, then didn't manage to read the rest. so the only things that stuck are 'objects' and 'message passing'
+
+# what might the code look like?
+
+sync code should just look like js/c-inspired syntax. or technically it shouldnt matter, as long as it can be run locally
+
+how do we pipe output and input? it could have some form of golang's channel-like syntax:
+
+```
+start -> functionA -> functionB, functionC -> functionE -> end
+start -> functionB, functionD -> functionA
+```
+
+internally, it could even compile down to statecharts (a la xstate)
