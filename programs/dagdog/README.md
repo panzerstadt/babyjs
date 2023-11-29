@@ -98,3 +98,78 @@ start -> functionB, functionD -> functionA
 ```
 
 internally, it could even compile down to statecharts (a la xstate)
+
+## data pipelining with db queries (natural habitat for dag workflows)
+
+```
+collector() -> receiver() -> transformer()* -> dbFetch(), resultTransformer() -> store()
+dbFetch() -> resultTransformer
+```
+
+```
+collector() {
+    // gets data
+    return data
+}
+
+receiver(incomingData) {
+    return data
+}
+
+transformer(data) {
+    const transformPayloadToDB = { }
+    const metadataForResult = { }
+    return { transformPayloadToDB, metadataForResult }
+}
+
+// async db fetch
+dbFetch(transformPayload) {
+
+}
+
+resultTransformer({ dbResult, metadata }) {
+    // post process
+    return result
+}
+
+// long running store process
+store() {
+
+}
+```
+
+## fetching from an api for a page
+
+```
+frontPage() -> handleFetch() -> api() -> postFetch() -> view()
+frontPage() -> view()
+```
+
+```
+frontPage() {
+    const displayHTML = "<div>hello, <button onClick={() => handleFetch({ query: "foo" })}>click me</div></div>"
+    return { displayHTML, handleFetch }
+}
+
+view({ html, htmlResult }) {
+    // shows html on screen
+
+    return `${html} ${htmlResult}`
+}
+
+handleFetch({ query }) {
+    // does some transformation
+    return { metadata, apiPayload }
+}
+
+api(payload) {
+    // do something
+    return res.status(200).json({ message: "ho" })
+}
+
+postFetch({ metadata, apiPayload }) {
+    const message = apiPayload.message
+    const htmlResult = "<div>you clicked me!</div>"
+    return htmlResult
+}
+```
