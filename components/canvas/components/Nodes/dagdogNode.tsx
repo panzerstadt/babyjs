@@ -19,6 +19,8 @@ export const DagDogNode = memo<{ data: any; isConnectable: boolean }>(({ data, i
   const showTargetHandle = nodeType === NODE_TYPE.END || nodeType === NODE_TYPE.MIDDLE;
   const showSourceHandle = nodeType === NODE_TYPE.START || nodeType === NODE_TYPE.MIDDLE;
 
+  const nodeInput = { value: 15 }; // TODO: this would come from the previous function, under data.input
+
   return (
     <div style={{ height: 400, width: 600 }}>
       {showTargetHandle && (
@@ -29,7 +31,7 @@ export const DagDogNode = memo<{ data: any; isConnectable: boolean }>(({ data, i
       )}
       <div className="text-xs text-gray-800">{data.label}</div>
       {/* <Repl lang="dagdog" /> */}
-      <Editor lang="dagdog" />
+      <Editor lang="dagdog" input={nodeInput} />
       {/* <input className="nodrag" type="color" onChange={data.onChange} defaultValue={data.color} /> */}
     </div>
   );

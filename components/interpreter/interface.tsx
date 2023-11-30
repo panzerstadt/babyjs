@@ -252,9 +252,10 @@ export const Repl: React.FC<ReplProps> = ({ focus, lang }) => {
 interface EditorProps {
   lang: Language;
   focus?: number; // a random number to trigger a useEffect dep
+  input?: Record<string, unknown>;
 }
 
-export const Editor: React.FC<EditorProps> = ({ focus, lang }) => {
+export const Editor: React.FC<EditorProps> = ({ focus, lang, input }) => {
   const cursor = useRef<HTMLInputElement>(null);
   const program = useRef<Program>();
   const [lines, setLines] = useState<Line[]>([]);
