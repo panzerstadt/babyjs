@@ -1,3 +1,4 @@
+import { time } from "console";
 import { BabyJs } from "../babyjs";
 
 describe("babyjs", () => {
@@ -711,6 +712,73 @@ describe("babyjs", () => {
         expect(logger.log).toHaveBeenNthCalledWith(1, ">>", 1);
         expect(logger.log).toHaveBeenNthCalledWith(2, ">>", 2);
       });
+    });
+  });
+
+  describe("async", () => {
+    // should even work without actualy implementing anything new
+    it("(desugared version) works", async () => {
+      /**
+       * desugared version of:
+       * // FFI: fetches data, returns that data
+       * async fn async(cb) {
+       *   // waits for 3 secs, then
+       *   cb("some text");
+       * }
+       *
+       * fn processData(data) {
+       *   print data;
+       *   print "processing data...";
+       * }
+       *
+       * async fn main() {
+       *   print "starting";
+       *   const data = await async();
+       *   processData(data);
+       *   print "async call complete!";
+       * }
+       *
+       */
+      const code = `
+      fn processData(data) {
+        print data;
+        print "processing data...";
+      }
+      
+      fn stateMachine(state, data) {
+        if (state == "start") {
+          fn ret(received) {
+            stateMachine("dataReceived", received);
+          }
+          print "starting";
+          async(ret); // at this point, user calls await
+          return;
+        }
+        if (state == "dataReceived") {
+          // rest of the user's code
+          processData(data);
+          print "async call complete!";
+
+          // end the machine
+          stateMachine("end", 0);
+          return;
+        }
+        if (state == "end") {
+          return;
+        }
+      }
+      
+      stateMachine("start", 0);
+      `;
+      babyjs.runOnce(code);
+      // FIXME: rn, we don't have an async loop, so the callback doesn't get awaited for
+      // we need a job executor OR an event loop to check every loop to see if the job is done.
+      // is this how we make it sync?
+
+      expect(logger.error).not.toHaveBeenCalled();
+      expect(logger.log).toHaveBeenNthCalledWith(1, ">>", "starting");
+      await new Promise((r) => setTimeout(r, 3200)); // technically expected? cause babyjs doesn't adhere to js async environments?
+      expect(logger.log).toHaveBeenLastCalledWith(">>", "async call complete!");
     });
   });
 });

@@ -213,7 +213,7 @@ export class Interpreter {
     return this.evaluate(expr.expression)!;
   }
 
-  private _isCallable(object: any): object is Callable {
+  _isCallable(object: any): object is Callable {
     return typeof object.call !== "undefined" && typeof object.call === "function";
   }
 
