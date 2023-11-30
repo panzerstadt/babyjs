@@ -265,11 +265,12 @@ export const Editor: React.FC<EditorProps> = ({ focus, lang, input }) => {
   const scrollToBottom = () => {
     // @ts-ignore
     cursor.current?.scrollIntoView({ behavior: "instant", block: "end", inline: "nearest" });
+    setLines((p) => [...p, { type: "out", value: "" }]);
   };
 
-  const [input, setInput] = useState("");
+  const [userInput, setUserInput] = useState("");
   const handleUpdateInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setInput(e.target.value);
+    setUserInput(e.target.value);
   };
   const handleSetStdout = (newOutput: string, type?: LineType) => {
     setLines((p) => [...p, { type: type ?? "out", value: newOutput }]);
@@ -277,14 +278,14 @@ export const Editor: React.FC<EditorProps> = ({ focus, lang, input }) => {
 
   const handleSendCode = () => {
     // interpret
-    const result = program.current?.input(input);
+    const result = program.current?.input(userInput);
     result && handleSetStdout(result);
 
     scrollToBottom();
   };
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col h-full mt-1">
       <Container
         key="terminal-container"
         bgColor="bg-stone-200"
