@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+// FIXME: switch to the fresh new DoublyLinkedList
 export const useHistory = () => {
   const [viewIdx, setViewIdx] = useState<number | null>(null);
   const [view, setView] = useState<any>();
