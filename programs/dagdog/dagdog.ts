@@ -1,7 +1,7 @@
 import { RuntimeError } from "./errors";
 import { Interpreter } from "./interpreters/interpreter";
 import { Parser } from "./parser";
-import { Scanner } from "./scan";
+import { Scanner } from "./scanner";
 import { LoggerType, Phase } from "./types";
 // import prompt from "prompt-sync";
 const newPrompt = (prefix: string) => ""; // prompt()
