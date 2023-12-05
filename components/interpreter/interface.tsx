@@ -285,6 +285,23 @@ export const Editor: React.FC<EditorProps> = ({ focus, lang, input }) => {
     scrollToBottom();
   };
 
+  const [isShiftKeyHeld, setIsShiftKeyHeld] = useState(false);
+  const handleKeydown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.shiftKey === true) {
+      setIsShiftKeyHeld(true);
+    }
+
+    if (e.key === "Enter") {
+      if (e.shiftKey === true) {
+        handleSendCode();
+        e.preventDefault();
+      }
+    }
+  };
+  const handleKeyUp = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    setIsShiftKeyHeld(false);
+  };
+
   const styles: { [key in LineType]: string } = {
     out: "text-slate-800",
     debug: "text-slate-600",
@@ -306,13 +323,22 @@ export const Editor: React.FC<EditorProps> = ({ focus, lang, input }) => {
       >
         <div className="bg-slate-900 h-full relative text-red-500">
           <textarea
+            onKeyDownCapture={handleKeydown}
+            onKeyUpCapture={handleKeyUp}
             onChange={handleUpdateInput}
             rows={10}
             className="h-full w-full bg-slate-900 p-3 text-white font-mono"
           ></textarea>
           <button
             onClick={() => handleSendCode()}
-            className="absolute bottom-2 right-2 text-sky-400 text-[10px] px-2 border border-sky-800 hover:bg-sky-400 hover:text-white rounded-md"
+            className={`
+            absolute bottom-2 right-2  text-[10px] px-2 
+            border
+            ${isShiftKeyHeld ? "bg-sky-500 text-sky-900" : ""}
+            text-sky-400 hover:text-white
+            border-sky-800 hover:bg-sky-400  
+            rounded-md
+            `}
           >
             send
           </button>
