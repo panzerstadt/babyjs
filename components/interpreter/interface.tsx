@@ -11,7 +11,7 @@ type LineType = StdEnvs | "usr" | "usr-tmp";
 const TABS = 4;
 const makeIntro: (lang: Language) => Line = (lang) => ({
   type: "out",
-  value: `Hello there, I'm ${lang}! Type 'help' for a nice intro.`,
+  value: `Hello there, I'm ${lang}! try calling 'help();' for a nice intro.`,
 });
 
 interface ReplProps {
