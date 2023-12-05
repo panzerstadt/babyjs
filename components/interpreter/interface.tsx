@@ -260,7 +260,8 @@ export const Editor: React.FC<EditorProps> = ({ focus, lang, input }) => {
   const program = useRef<Program>();
   const [lines, setLines] = useState<Line[]>([]);
   useEffect(() => { program.current = new Program(lang) }, [lang]); // prettier-ignore
-  useStd(program, "out", setLines, () => scrollToBottom());
+  useStd(program, "out", setLines, () => scrollToBottom(), false, "replace");
+  useStd(program, "err", setLines, () => scrollToBottom(), true, "replace");
 
   const scrollToBottom = () => {
     // @ts-ignore
@@ -272,16 +273,26 @@ export const Editor: React.FC<EditorProps> = ({ focus, lang, input }) => {
   const handleUpdateInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setUserInput(e.target.value);
   };
-  const handleSetStdout = (newOutput: string, type?: LineType) => {
+  const handleAppendStdout = (newOutput: string, type?: LineType) => {
     setLines((p) => [...p, { type: type ?? "out", value: newOutput }]);
   };
 
   const handleSendCode = () => {
     // interpret
     const result = program.current?.input(userInput);
-    result && handleSetStdout(result);
+    result && handleAppendStdout(result);
 
     scrollToBottom();
+  };
+
+  const styles: { [key in LineType]: string } = {
+    out: "text-slate-800",
+    debug: "text-slate-600",
+    env: "text-slate-400",
+    err: "text-red-500",
+    usr: "text-sky-600",
+    "usr-tmp": "text-sky-800",
+    info: "text-orange-700 text-[11px] leading-[13px] select-none",
   };
 
   return (
@@ -307,13 +318,13 @@ export const Editor: React.FC<EditorProps> = ({ focus, lang, input }) => {
           </button>
         </div>
       </Container>
-      <div ref={cursor} className="h-8">
+      <div ref={cursor} className="h-8 w-full flex flex-col">
         {lines.map((s, i) => {
           return (
             <code
               key={i}
               className={`
-              hover:bg-slate-800
+              ${styles[s.type]} hover:bg-slate-300
                 animate-fade whitespace-break-spaces`}
             >
               {s.value}

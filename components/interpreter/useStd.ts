@@ -25,7 +25,8 @@ export const useStd = (
   stdType: StdEnvs,
   setLines: Dispatch<SetStateAction<Line[]>>,
   onLineOut?: () => void,
-  immediate?: boolean
+  immediate?: boolean,
+  printType: "append" | "replace" = "append"
 ) => {
   const queue = useQueue<Line>();
   const currentRef = ref.current?.[`std${stdType}`];
@@ -34,6 +35,11 @@ export const useStd = (
     const std = currentRef
       .split("\n")
       .map((s) => ({ type: stdType, value: removePhase(removeTimestamp(s)) || " " }));
+
+    if (printType === "replace") {
+      setLines([]);
+      onLineOut?.();
+    }
 
     if (std) {
       queue?.enqueue_batch(std);
