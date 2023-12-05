@@ -93,6 +93,6 @@ export class Program {
     }
 
     this.clearStd();
-    return this.interpreter.run(code, this.verbose, true);
+    return this.interpreter.repl(code, this.verbose, true);
   }
 }

@@ -7,4 +7,4 @@ const puppy = new DagDog();
 // const initialTest = "print 0 + 3 / (2 * 5);";
 const initialTest = `let test = "hello world";`;
 console.log("running initial test of: ", initialTest);
-puppy.run(initialTest, true);
+puppy.repl(initialTest, true);

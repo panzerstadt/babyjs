@@ -7,4 +7,4 @@ const baby = new BabyJs();
 // const initialTest = "print 0 + 3 / (2 * 5);";
 const initialTest = `let test = "hello world";`;
 console.log("running initial test of: ", initialTest);
-baby.run(initialTest, true);
+baby.repl(initialTest, true);

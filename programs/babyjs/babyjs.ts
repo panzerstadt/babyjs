@@ -45,13 +45,13 @@ export class BabyJs {
   }
 
   runOnce(code: string | null, debug: boolean = false) {
-    this.run(code, debug, true);
+    this.repl(code, debug, true);
   }
   /**
    * when the interpreter stores global variables.
    * Those variables should persist throughout the REPL session.
    */
-  run(code: string | null = null, debug: boolean = false, once: boolean = false) {
+  repl(code: string | null = null, debug: boolean = false, once: boolean = false) {
     if (!code) return this.nextLoop(debug, once);
 
     // 1. scan text, turn them into tokens that the language recognizes
@@ -94,7 +94,7 @@ export class BabyJs {
       return;
     }
 
-    this.run(nextCode, debug);
+    this.repl(nextCode, debug);
   }
 
   runFile(filepath: string) {
