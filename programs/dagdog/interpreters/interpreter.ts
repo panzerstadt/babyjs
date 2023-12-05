@@ -13,6 +13,7 @@ import { Function } from "../functions/basefunction";
 import { Return } from "../return";
 import { Async } from "../functions/foreignfunctions/dummyasync";
 import { Csv, Review } from "../functions/foreignfunctions/csv";
+import { Help } from "../functions/foreignfunctions/help";
 
 const statementIsVariableExpression = (
   statements: AnyStmt[]
@@ -32,6 +33,7 @@ export class Interpreter {
 
   constructor() {
     // FFI (this is where we allow the users to work with files, read user input etc)
+    this.globals.define("help", new Help());
     this.globals.define("clock", new Clock());
     this.globals.define("ls", new Ls());
     this.globals.define("visit", new Visit());
