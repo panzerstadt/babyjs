@@ -44,7 +44,7 @@ const customNodeSelectors = {
 // prettier-ignore
 const initialNodes: Node[] = [
   { id: "internet", position: { x: posX(-2.75), y: posY() }, data: { type: NODE_TYPE.START, label: "Init" }, type: "dagdog" },
-  { id: "main-router", position: { x: posX(-0.5), y: posY() }, data: { type: NODE_TYPE.MIDDLE, ...mainRouter }, type: "dagdog" },
+  { id: "main-router", position: { x: posX(-0.5), y: posY() }, data: { type: NODE_TYPE.MIDDLE, label: "Second function" }, type: "dagdog" },
   { id: "subnet-router", position: { x: posX(2), y: posY() }, data: { type: NODE_TYPE.MIDDLE, ...subnetRouter }, type: "monitor" },
   // slate ax
   { id: 'nanopi-r5s', position: { x: posX(2), y: posY(2) }, data: { type: NODE_TYPE.MIDDLE, ...npir5s }, type: "monitor" },
