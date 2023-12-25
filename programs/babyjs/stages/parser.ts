@@ -1,9 +1,9 @@
-import { ParseError } from "./errors";
-import { AnyExpr, Expr } from "./constructs/expressions";
-import { AnyStmt, Stmt } from "./constructs/statements";
-import { Token, _EMPTY_FN_RETURN } from "./token";
-import { LoggerType, TokenType } from "./types";
-import { MAX_PARAMETER_COUNT } from "./constants";
+import { ParseError } from "../errors";
+import { AnyExpr, Expr } from "../constructs/expressions";
+import { AnyStmt, Stmt } from "../constructs/statements";
+import { Token, _EMPTY_FN_RETURN } from "../token";
+import { LoggerType, TokenType } from "../types";
+import { MAX_PARAMETER_COUNT } from "../constants";
 
 // TODO: fun extra challenge: support IF x THEN y ELSE z
 // which is different from js ternaries (also included) as well as python ternaries (expr1 if condition else expr2)

@@ -1,6 +1,6 @@
-import { ScanError } from "./errors";
-import { Token, accidentalKeywords, keywords } from "./token";
-import { LoggerType, TokenType } from "./types";
+import { ScanError } from "../errors";
+import { Token, accidentalKeywords, keywords } from "../token";
+import { LoggerType, TokenType } from "../types";
 
 // in the context of the dts, the scanner can tell us
 // whether the tokens have been misspelled or are not

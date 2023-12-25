@@ -1,4 +1,4 @@
-import { Interpreter } from "./interpreters/interpreter";
+import { Interpreter } from "./stages/interpreters/interpreter";
 
 export class Callable {
   arity(): number {

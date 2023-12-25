@@ -1,7 +1,7 @@
 import { Callable } from "../callable";
 import { Stmt } from "../constructs/statements";
 import { Environment } from "../environment";
-import { Interpreter } from "../interpreters/interpreter";
+import { Interpreter } from "../stages/interpreters/interpreter";
 import { RETURN_EXCEPTION } from "../return";
 import { _EMPTY_FN_RETURN } from "../token";
 

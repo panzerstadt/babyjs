@@ -1,19 +1,19 @@
-import { Environment } from "../environment";
-import { RuntimeError } from "../errors";
-import { AnyExpr, Expr } from "../constructs/expressions";
-import { AnyStmt, Stmt } from "../constructs/statements";
-import { Token, _EMPTY_FN_RETURN, _UNINITIALIZED } from "../token";
-import { LoggerType, TokenType, assertNever } from "../types";
+import { Environment } from "../../environment";
+import { RuntimeError } from "../../errors";
+import { AnyExpr, Expr } from "../../constructs/expressions";
+import { AnyStmt, Stmt } from "../../constructs/statements";
+import { Token, _EMPTY_FN_RETURN, _UNINITIALIZED } from "../../token";
+import { LoggerType, TokenType, assertNever } from "../../types";
 import { PrintStyle, printAST } from "./pprinter";
-import { isTruthy } from "../constants";
-import { Callable } from "../callable";
-import { Clock } from "../functions/foreignfunctions/clock";
-import { Ls, Visit } from "../functions/foreignfunctions/blogInterface";
-import { Function } from "../functions/basefunction";
-import { Return } from "../return";
-import { Async } from "../functions/foreignfunctions/dummyasync";
-import { Csv, Review } from "../functions/foreignfunctions/csv";
-import { Help } from "../functions/foreignfunctions/help";
+import { isTruthy } from "../../constants";
+import { Callable } from "../../callable";
+import { Clock } from "../../functions/foreignfunctions/clock";
+import { Ls, Visit } from "../../functions/foreignfunctions/blogInterface";
+import { Function } from "../../functions/basefunction";
+import { Return } from "../../return";
+import { Async } from "../../functions/foreignfunctions/dummyasync";
+import { Csv, Review } from "../../functions/foreignfunctions/csv";
+import { Help } from "../../functions/foreignfunctions/help";
 
 const statementIsVariableExpression = (
   statements: AnyStmt[]

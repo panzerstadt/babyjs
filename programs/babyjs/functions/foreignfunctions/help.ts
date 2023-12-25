@@ -1,5 +1,5 @@
 import { Callable } from "../../callable";
-import { Interpreter } from "../../interpreters/interpreter";
+import { Interpreter } from "../../stages/interpreters/interpreter";
 
 const HELP = `
 hey there welcome to the babyjs language! you might notice that it looks really similar to javascript.

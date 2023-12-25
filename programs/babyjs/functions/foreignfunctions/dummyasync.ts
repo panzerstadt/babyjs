@@ -1,5 +1,5 @@
 import { Callable } from "../../callable";
-import { Interpreter } from "../../interpreters/interpreter";
+import { Interpreter } from "../../stages/interpreters/interpreter";
 
 export class Async extends Callable {
   arity(): number {

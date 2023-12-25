@@ -1,6 +1,6 @@
 import { Chat } from "@/pages/api/llm";
 import { Callable } from "../../callable";
-import { Interpreter } from "../../interpreters/interpreter";
+import { Interpreter } from "../../stages/interpreters/interpreter";
 import { _EMPTY_FN_RETURN } from "../../token";
 
 const DUMMY_DATA = `ID,Name,Age,Email,Salary

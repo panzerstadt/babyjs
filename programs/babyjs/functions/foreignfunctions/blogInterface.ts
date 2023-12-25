@@ -1,5 +1,5 @@
 import { Callable } from "../../callable";
-import { Interpreter } from "../../interpreters/interpreter";
+import { Interpreter } from "../../stages/interpreters/interpreter";
 
 import data from "../../../blog/data.json";
 import { RuntimeError } from "../../errors";

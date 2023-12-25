@@ -1,5 +1,5 @@
-import { AnyExpr } from "../constructs/expressions";
-import { AnyStmt } from "../constructs/statements";
+import { AnyExpr } from "../../constructs/expressions";
+import { AnyStmt } from "../../constructs/statements";
 
 /**
  * This is also an interpreter,
