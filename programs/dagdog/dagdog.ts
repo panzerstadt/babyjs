@@ -77,7 +77,7 @@ export class DagDog {
     debug && this.debugPprintStep("Interpreting");
     const error = this.interpreter.interpret(statements, debug);
     if (error) {
-      console.error(error);
+      // console.error(error);
       this.runtimeError(error);
     }
 

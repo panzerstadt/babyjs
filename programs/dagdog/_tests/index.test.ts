@@ -1,16 +1,17 @@
 import { DagDog } from "../dagdog";
+const DEBUG = false;
 
 describe("babyjs", () => {
   let babyjs: DagDog;
   const logger = {
     log: jest.fn((...s: string[]) => {
-      console.log("log:", ...s);
+      DEBUG && console.log("log:", ...s);
     }),
     info: jest.fn((...s: string[]) => {
-      console.info("log:", ...s);
+      DEBUG && console.info("log:", ...s);
     }),
     error: jest.fn((phase: string, ...e: string[]) => {
-      console.log("err:", ...e);
+      DEBUG && console.log("err:", ...e);
     }),
   };
 
