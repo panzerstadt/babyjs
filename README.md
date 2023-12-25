@@ -1,5 +1,15 @@
 # BabyJS
 
+excerpts from [the hundred-year language](https://paulgraham.com/hundred.html)
+
+> What programmers in a hundred years will be looking for, most of all, is a language where you can throw together an unbelievably inefficient version 1 of a program with the least possible effort.
+
+> I don't predict the demise of object-oriented programming, by the way. Though I don't think it has much to offer good programmers, except in certain specialized domains, it is irresistible to large organizations. Object-oriented programming offers a sustainable way to write spaghetti code. It lets you accrete programs as a series of patches. Large organizations always tend to develop software this way, and I expect this to be as true in a hundred years as it is today.
+
+> Will the future ever catch up with it? People have been talking about parallel computation as something imminent for at least 20 years, and it hasn't affected programming practice much so far. Or hasn't it? Already chip designers have to think about it, and so must people trying to write systems software on multi-cpu computers.
+>
+> The real question is, how far up the ladder of abstraction will parallelism go? In a hundred years will it affect even application programmers? Or will it be something that compiler writers think about, but which is usually invisible in the source code of applications?
+
 Site: [BabyJS](https://babyjs.vercel.app/)
 
 This is an ongoing project to build a programming language by following along with the amazing book [Crafting Interpreters](https://craftinginterpreters.com/).
