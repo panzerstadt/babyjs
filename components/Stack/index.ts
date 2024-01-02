@@ -1,5 +1,5 @@
 type Node<T> = {
-  value: T;
+  readonly value: T;
   next?: Node<T>;
 };
 
@@ -19,12 +19,19 @@ export class Stack<T> {
     return this.length;
   }
   get(idx: number): T | undefined {
+    if (idx < 0 || idx >= this.length) {
+      return undefined;
+    }
+
     let current = this.head;
     for (let i = 0; i < this.length; i++) {
       if (i === idx) {
         return current?.value;
       }
-      current = current?.next;
+      if (!current) {
+        throw new Error("Invalid linked list");
+      }
+      current = current.next;
     }
   }
 
@@ -62,7 +69,7 @@ export class Stack<T> {
   }
 
   push(item: T): void {
-    console.log(`op: ${this.push.name}: ${item}`);
+    console.log(`op: PUSH: <${item}>`);
     const node = { value: item } as Node<T>;
     this.length++;
 
@@ -74,12 +81,12 @@ export class Stack<T> {
   }
   pop(): T | undefined {
     if (!this.head) return undefined;
-    console.log(`op ${this.pop.name}`);
 
     this.length--;
     const head = this.head;
     this.head = this.head?.next;
 
+    console.log(`op: POP, val: ${head?.value}`);
     console.table({ head: this.head, length: this.length });
 
     return head?.value;
