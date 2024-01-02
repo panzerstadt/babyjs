@@ -1,3 +1,5 @@
+// npm run test babyjs/_tests
+
 import { time } from "console";
 import { BabyJs } from "../babyjs";
 
@@ -146,56 +148,15 @@ describe("babyjs", () => {
     });
   });
 
+  // prettier-ignore
   describe("if else", () => {
-    it("if works", () => {
-      const code = `if (true) print "GOAL";`;
-      babyjs.runOnce(code);
-
-      expect(logger.error).not.toHaveBeenCalled();
-      expect(logger.log).toHaveBeenCalledWith(">>", "GOAL");
-    });
-    it("if else works", () => {
-      const code = `if (false) print "NOPE"; else print "GOAL";`;
-      babyjs.runOnce(code);
-
-      expect(logger.error).not.toHaveBeenCalled();
-      expect(logger.log).toHaveBeenCalledWith(">>", "GOAL");
-    });
-    it("if with curly braces works", () => {
-      const code = `if (true) { print "GOAL"; }`;
-      babyjs.runOnce(code);
-
-      expect(logger.error).not.toHaveBeenCalled();
-      expect(logger.log).toHaveBeenCalledWith(">>", "GOAL");
-    });
-    it("if else with curly braces works", () => {
-      const code = `if (false) { print "NOPE"; } else { print "GOAL"; }`;
-      babyjs.runOnce(code);
-
-      expect(logger.error).not.toHaveBeenCalled();
-      expect(logger.log).toHaveBeenCalledWith(">>", "GOAL");
-    });
-    it("chains without curly braces (but best not to do this), where else applies to closest if condition", () => {
-      const code = `if (true) if (false) print "NOPE"; else print "GOAL";`;
-      babyjs.runOnce(code);
-
-      expect(logger.error).not.toHaveBeenCalled();
-      expect(logger.log).toHaveBeenCalledWith(">>", "GOAL");
-    });
-    it("if, else if, works with curly braces", () => {
-      const code = `if (false) { print "NOPE"; } else if (true) { print "GOAL"; }`;
-      babyjs.runOnce(code);
-
-      expect(logger.error).not.toHaveBeenCalled();
-      expect(logger.log).toHaveBeenCalledWith(">>", "GOAL");
-    });
-    it("if, else if, else, works with curly braces", () => {
-      const code = `if (false) { print "NOPE"; } else if (false) { print "NOPE"; } else { print "GOAL"; }`;
-      babyjs.runOnce(code);
-
-      expect(logger.error).not.toHaveBeenCalled();
-      expect(logger.log).toHaveBeenCalledWith(">>", "GOAL");
-    });
+    it("if works", () => this_code(`if (true) print "GOAL";`).shouldPrint("GOAL"));
+    it("if else works", () => this_code(`if (false) print "NOPE"; else print "GOAL";`).shouldPrint("GOAL"));
+    it("if with curly braces works", () => this_code(`if (true) { print "GOAL"; }`).shouldPrint("GOAL"));
+    it("if else with curly braces works", () => this_code(`if (false) { print "NOPE"; } else { print "GOAL"; }`).shouldPrint("GOAL"));
+    it("chains without curly braces (but best not to do this), where else applies to closest if condition", () => this_code(`if (true) if (false) print "NOPE"; else print "GOAL";`).shouldPrint("GOAL"));
+    it("if, else if, works with curly braces", () => this_code(`if (false) { print "NOPE"; } else if (true) { print "GOAL"; }`).shouldPrint("GOAL"));
+    it("if, else if, else, works with curly braces", () => this_code(`if (false) { print "NOPE"; } else if (false) { print "NOPE"; } else { print "GOAL"; }`).shouldPrint("GOAL"));
   });
 
   describe("while loop", () => {
