@@ -78,4 +78,4 @@ export interface LoggerType {
   visit?: (str: string) => void;
 }
 
-export type Phase = "scan" | "parse" | "interpret";
+export type Phase = "scan" | "parse" | "resolve-variable" | "interpret";
