@@ -46,3 +46,8 @@ export const isValidUserValue = (object: unknown): boolean => {
 
   return true;
 };
+
+export enum FunctionType {
+  NONE = "NONE",
+  FUNCTION = "FUNCTION",
+}
