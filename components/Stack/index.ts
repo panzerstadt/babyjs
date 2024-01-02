@@ -15,6 +15,18 @@ export class Stack<T> {
   isEmpty() {
     return this.length === 0;
   }
+  size() {
+    return this.length;
+  }
+  get(idx: number): T | undefined {
+    let current = this.head;
+    for (let i = 0; i < this.length; i++) {
+      if (i === idx) {
+        return current?.value;
+      }
+      current = current?.next;
+    }
+  }
 
   view(resolver?: Function): void {
     const output = [];
