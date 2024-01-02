@@ -36,18 +36,29 @@ export class Stack<T> {
       output.push(current?.value);
       current = current?.next;
     }
+    let max_width = 0;
     const output_str = output
       .map((item) => {
+        let res: string = "";
         try {
           if (!resolver) throw new Error("no resolver");
-          return resolver(item);
+          res = resolver(item)?.toString();
         } catch {
-          return item;
+          res = item?.toString() || "";
         }
+        max_width = Math.max(max_width, res.length);
+        return [res, res.length] as const;
       })
-      .join(" -> ");
+      .map(
+        ([v, len]) =>
+          `|${v}${Array(max_width - len)
+            .fill(" ")
+            .join("")}|`
+      )
+      .join("\n");
 
-    console.log(`[top ${output_str} base]`);
+    // prettier-ignore
+    console.log(`|${Array(max_width).fill(" ").join("")}|\n${output_str}\n ${Array(max_width).fill("-").join("")}`);
   }
 
   push(item: T): void {

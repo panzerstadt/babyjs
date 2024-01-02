@@ -30,3 +30,27 @@ test("stack", function () {
 
   //yayaya
 });
+
+test("fancy stack", () => {
+  /**
+    |                |
+    |k:three, v:false|
+    |k:two, v:true   |
+    |k:one, v:false  |
+    ----------------
+   */
+  const list = new Stack<Map<string, boolean>>();
+
+  list.push(new Map<string, boolean>().set("one", false));
+  list.push(new Map<string, boolean>().set("two", true));
+  list.push(new Map<string, boolean>().set("three", false));
+
+  list.view((item: Map<string, boolean>) => {
+    let row = "";
+    item.forEach((v, k) => {
+      row += `k:${k}, v:${v}`;
+    });
+
+    return row;
+  });
+});
