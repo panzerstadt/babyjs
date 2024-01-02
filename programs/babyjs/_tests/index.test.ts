@@ -32,6 +32,14 @@ describe("babyjs", () => {
         expect(logger.log).not.toHaveBeenCalled();
         expect(logger.error).toHaveBeenCalledWith("interpret", expect.stringContaining(str));
       },
+      shouldErrorAtVariableResolveMentioning: (str: string) => {
+        expect(logger.log).not.toHaveBeenCalled();
+        expect(logger.error).toHaveBeenCalledWith("resolve-variable", expect.stringContaining(str));
+      },
+      shouldErrorAtParseMentioning: (str: string) => {
+        expect(logger.log).not.toHaveBeenCalled();
+        expect(logger.error).toHaveBeenCalledWith("parse", expect.stringContaining(str));
+      },
       shouldErrorAtScantimeMentioning: (str: string) => {
         expect(logger.log).not.toHaveBeenCalled();
         expect(logger.error).toHaveBeenCalledWith("scan", expect.stringContaining(str));
