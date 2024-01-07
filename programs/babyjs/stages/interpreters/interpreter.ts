@@ -292,7 +292,10 @@ export class Interpreter {
         if (typeof left === "string" && typeof right === "string") {
           return (left + right) as string;
         }
-        throw new RuntimeError("Operands must be two numbers or two strings.", expr.operator);
+        throw new RuntimeError(
+          `Operands must be two numbers or two strings. left: ${left}, right: ${right}`,
+          expr.operator
+        );
       case TokenType.SLASH:
         this.checkNumberOperands(expr.operator, left, right);
         this.checkDivideByZero(expr.operator, right);
