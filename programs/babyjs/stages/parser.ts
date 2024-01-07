@@ -405,7 +405,7 @@ export class Parser {
    */
   private rangeForStatement() {
     // for (<here> in 0..5) { ... }
-    const name = this.consume(TokenType.IDENTIFIER, "Expect variable name in 'for' loop");
+    const initializer = this.varDeclaration(false);
     // for (i <here> 0..5) { ... }
     this.consume(TokenType.IN, "Expect 'in' in 'for' clause.");
     // for (i in <here>..5) { ... }
@@ -422,7 +422,7 @@ export class Parser {
     this.consume(TokenType.RIGHT_PAREN, "Expect ')' after 'for' clauses");
     const body = this.statement();
 
-    return Stmt.Block([Stmt.RangeFor(name, start, end, inclusive, body)]);
+    return Stmt.Block([initializer, Stmt.RangeFor(initializer, start, end, inclusive, body)]);
   }
 
   /**
@@ -563,14 +563,14 @@ export class Parser {
     return Stmt.Function(name, parameters, body);
   }
 
-  private varDeclaration() {
+  private varDeclaration(semicolons: boolean = true) {
     const name = this.consume(TokenType.IDENTIFIER, "Expect variable name");
     let initializer = null;
     if (this.match(TokenType.EQUAL)) {
       initializer = this.expression();
     }
 
-    this.consume(TokenType.SEMICOLON, "Expect ';' after variable declaration.");
+    semicolons && this.consume(TokenType.SEMICOLON, "Expect ';' after variable declaration.");
     return Stmt.Let(name, initializer!);
   }
 

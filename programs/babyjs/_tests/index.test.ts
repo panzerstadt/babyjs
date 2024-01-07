@@ -268,7 +268,7 @@ describe("babyjs", () => {
       expect(logger.log).toHaveBeenLastCalledWith(">>", 6765);
     });
 
-    describe.skip("rusty for loops (rangeFor)", () => {
+    describe("rusty for loops (rangeFor)", () => {
       it("works using rust-style range expression (RangeExpr): start..end (start ≤ x < end)", () => {
         const code = `for (i in 0..10) { print i; }`;
         babyjs.runOnce(code);

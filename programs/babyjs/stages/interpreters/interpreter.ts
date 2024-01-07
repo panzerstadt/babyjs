@@ -391,11 +391,11 @@ export class Interpreter {
         `Start and End values of for loop must evaluate to numbers. start:"${startValue}" end:"${endValue}"`
       );
     }
-    // for (<here> in 0..5) { ... }
-    this.environment.define(stmt.initializerName.lexeme, startValue, stmt.initializerName);
 
     for (let i = startValue; stmt.inclusive ? i <= endValue : i < endValue; i++) {
-      this.environment.assign(stmt.initializerName, i); // increments the value
+      // in parse, we already initialize our variable in block scope
+      // here we merely ingrement
+      this.environment.assign(stmt.initializerRef.name, i); // increments the value
       this.execute(stmt.body);
     }
     return null;

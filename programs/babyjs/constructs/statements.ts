@@ -82,7 +82,7 @@ const blockStmt = (statements: AnyStmt[]): Block => {
 
 interface RangeFor {
   readonly type: "rangeFor";
-  readonly initializerName: Token; // for (<here> in 0..5) { ... }
+  readonly initializerRef: Let; // for (<here> in 0..5) { ... }
   readonly start: AnyExpr; // for (i in <here>..5) { ... }
   readonly end: AnyExpr; // for (i in 0..<here>) { ... }
   readonly inclusive: boolean;
@@ -90,13 +90,13 @@ interface RangeFor {
 }
 
 const rangeFor = (
-  initializerName: Token,
+  initializerRef: Let,
   start: AnyExpr,
   end: AnyExpr,
   inclusive: boolean,
   body: AnyStmt
 ): RangeFor => {
-  return { type: "rangeFor", initializerName, start, end, inclusive, body };
+  return { type: "rangeFor", initializerRef, start, end, inclusive, body };
 };
 
 export type AnyStmt = Expression | Function | If | Print | Return | Let | Block | While | RangeFor;
