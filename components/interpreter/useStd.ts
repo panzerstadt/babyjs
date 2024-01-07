@@ -1,7 +1,7 @@
 import { Dispatch, MutableRefObject, SetStateAction, useEffect } from "react";
 import { Program, StdEnvs } from "./program";
 import { Line } from "./interface";
-import { useQueue } from "../Queuesss/useQueue";
+import { useQueue } from "../Queue/useQueue";
 
 const TERMINAL_SPEED_MS = 30;
 
