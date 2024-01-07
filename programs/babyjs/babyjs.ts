@@ -33,6 +33,8 @@ export class BabyJs {
         return "parse";
       case "Interpreting":
         return "interpret";
+      case "Resolver Pass: Variable Resolver":
+        return "resolve-variable";
       default:
         throw new Error("unknown phase");
     }
