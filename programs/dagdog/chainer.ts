@@ -86,6 +86,7 @@ export class Chainer {
   }
 
   // build chained program
+  // @ts-ignore
   build(code: string, debug: boolean = false): ChainedProgram {
     /**
      * the role of the chainer is to take the loop over each code block
