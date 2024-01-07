@@ -177,7 +177,7 @@ export class Interpreter {
 
   private checkNumberOperands(operator: Token, firstOperand: Object, secondOperand: Object) {
     if (typeof firstOperand === "number" && typeof secondOperand === "number") return;
-    throw new RuntimeError("Operands must be numbers.", operator);
+    throw new RuntimeError(`Operands must be numbers. Received '${firstOperand} ${operator.lexeme} ${secondOperand}'`, operator); // prettier-ignore
   }
 
   private checkDivideByZero(operator: Token, secondOperand: Object) {
