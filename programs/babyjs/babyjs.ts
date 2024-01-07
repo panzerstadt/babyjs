@@ -1,6 +1,7 @@
 import { RuntimeError } from "./errors";
 import { Interpreter } from "./stages/interpreters/interpreter";
 import { Parser } from "./stages/parser";
+import { VariableResolver } from "./stages/resolvers/variableresolver";
 import { Scanner } from "./stages/scanner";
 import { LoggerType, Phase } from "./types";
 // import prompt from "prompt-sync";
@@ -72,6 +73,14 @@ export class BabyJs {
     const statements = parser.parse(debug);
 
     if (parser.hadError()) return this.nextLoop(debug, once);
+
+    // 2.5 resolvers (post-parse, pre-interrpret)
+    debug && this.debugPprintStep("Resolver Pass: Variable Resolver");
+    const variableResolver = new VariableResolver(this.interpreter);
+    variableResolver.setLogger(this.logger);
+    variableResolver.resolve(statements);
+
+    if (variableResolver.hadError()) return this.nextLoop(debug, once);
 
     // 3. interpret expression and show result
     //       interpreter can't be new every time because

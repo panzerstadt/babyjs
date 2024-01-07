@@ -142,6 +142,10 @@ e.g: let my_variable = "one"; ---> my_variable = "two";
     throw new RuntimeError(`Undefined variable '${name.lexeme}`, name);
   }
 
+  assignAt(distance: number, name: Token, value: Object) {
+    this.ancestor(distance).values.set(name.lexeme, value);
+  }
+
   get(name: Token): Object {
     if (this.values.has(name.lexeme)) {
       this.debug && this.debugPrintEnvironment(this.get.name);
@@ -157,5 +161,19 @@ e.g: let my_variable = "one"; ---> my_variable = "two";
     if (this.enclosing !== null) return this.enclosing.get(name);
 
     throw new RuntimeError(`Undefined variable '${name.lexeme}'.`, name);
+  }
+
+  getAt(distance: number, name: string): Object {
+    return this.ancestor(distance).values.get(name)!;
+  }
+
+  ancestor(distance: number): Environment {
+    let environment = this as Environment;
+
+    for (let i = 0; i < distance; i++) {
+      environment = environment.enclosing!;
+    }
+
+    return environment;
   }
 }

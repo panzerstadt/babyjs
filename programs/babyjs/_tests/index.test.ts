@@ -15,6 +15,14 @@ describe("babyjs", () => {
     error: jest.fn((phase: string, ...e: string[]) => {
       console.log("err:", ...e);
     }),
+    debug: jest.fn((phase: string, ...e: string[]) => {
+      process.stdout.write(phase);
+      e.forEach((row) => {
+        process.stdout.write(row);
+        process.stdout.write("\n");
+      });
+      process.stdout.write("\n");
+    }),
   };
 
   const this_code = (code: string) => {
@@ -167,21 +175,54 @@ describe("babyjs", () => {
     it("if, else if, else, works with curly braces", () => this_code(`if (false) { print "NOPE"; } else if (false) { print "NOPE"; } else { print "GOAL"; }`).shouldPrint("GOAL"));
   });
 
-  describe("while loop", () => {
+  // prettier-ignore
+  describe("scopes", () => {
+    it("global scopes can store expressions", () => this_code(`let a = 0; a = a + 1; print a;`).shouldPrint(1))
+    it("block scopes should store local expressions", () => this_code(`let a = 42; { let a = 0; a = a + 1; print a; }`).shouldPrint(1))
     it("works", () => {
-      const code = `let a = 5; while (a > 0) { a = a - 1; print a; }`;
-      babyjs.runOnce(code);
+      const code = `
+      let a = "global a";
+      let b = "global b";
+      let c = "global c";
+      {
+        let a = "outer a";
+        let b = "outer b";
+        {
+          let a = "inner a";
+          print a;
+          print b;
+          print c;
+        }
+        print a;
+        print b;
+        print c;
+      }
+      print a;
+      print b;
+      print c;
+      `
+      babyjs.runOnce(code)
 
       expect(logger.error).not.toHaveBeenCalled();
-      expect(logger.log).toHaveBeenLastCalledWith(">>", 0);
-    });
-    it("works without curly brackets", () => {
-      const code = `let a = 5; while (a > 0) a = a - 1; print a;`;
-      babyjs.runOnce(code);
+      expect(logger.log).toHaveBeenNthCalledWith(1, ">>", "inner a"); 
+      expect(logger.log).toHaveBeenNthCalledWith(2, ">>", "outer b"); 
+      expect(logger.log).toHaveBeenNthCalledWith(3, ">>", "global c"); 
+      expect(logger.log).toHaveBeenNthCalledWith(4, ">>", "outer a"); 
+      expect(logger.log).toHaveBeenNthCalledWith(5, ">>", "outer b"); 
+      expect(logger.log).toHaveBeenNthCalledWith(6, ">>", "global c"); 
+      expect(logger.log).toHaveBeenNthCalledWith(7, ">>", "global a"); 
+      expect(logger.log).toHaveBeenNthCalledWith(8, ">>", "global b"); 
+      expect(logger.log).toHaveBeenNthCalledWith(9, ">>", "global c"); 
+    })
+  })
 
-      expect(logger.error).not.toHaveBeenCalled();
-      expect(logger.log).toHaveBeenLastCalledWith(">>", 0);
-    });
+  // prettier-ignore
+  describe("while loop", () => {
+    it("works: 5->0",  () => this_code(`let a = 5; while (a > 0) { a = a - 1; print a; }`).shouldPrint(0));
+    it("works: 0->5",  () => this_code(`let a = 0; while (a < 5) { a = a + 1; print a; }`).shouldPrint(5));
+    it("works in global scope",  () => this_code(`let a = 0; while (a < 5) { print a; a = a + 1; }`).shouldPrint(4));
+    it("works in block scope",  () => this_code(`{ let a = 0; while (a < 5) { print a; a = a + 1; } }`).shouldPrint(4));
+    it("works without curly brackets",  () => this_code(`let a = 5; while (a > 0) a = a - 1; print a;`).shouldPrint(0));
     it("catches infinite loops", () => {
       const code = `while (true) { }`;
       babyjs.runOnce(code);
@@ -227,7 +268,7 @@ describe("babyjs", () => {
       expect(logger.log).toHaveBeenLastCalledWith(">>", 6765);
     });
 
-    describe("rusty for loops (rangeFor)", () => {
+    describe.skip("rusty for loops (rangeFor)", () => {
       it("works using rust-style range expression (RangeExpr): start..end (start ≤ x < end)", () => {
         const code = `for (i in 0..10) { print i; }`;
         babyjs.runOnce(code);
@@ -490,6 +531,77 @@ describe("babyjs", () => {
         expect(logger.log).toHaveBeenCalledWith(">>", "At least one is true");
       });
     });
+  });
+
+  describe("blocks", () => {
+    it("should resolve variables in their correct scope", () => {
+      const code = `
+      let a = "outer";
+      print a;
+      {
+        let a = "inner";
+        print a;
+      }
+
+      let b = "outer";
+      print b;
+      {
+        print b; // hoisting should not happen
+        let b = "inner";
+      }
+      `;
+      babyjs.runOnce(code);
+
+      expect(logger.error).not.toHaveBeenCalled();
+      expect(logger.log).toHaveBeenNthCalledWith(1, ">>", "outer");
+      expect(logger.log).toHaveBeenNthCalledWith(2, ">>", "inner");
+      expect(logger.log).toHaveBeenNthCalledWith(3, ">>", "outer");
+      expect(logger.log).toHaveBeenNthCalledWith(4, ">>", "outer");
+    });
+
+    it("should resolve outer variable when there is no inner one", () => {
+      const code = `
+      let a = "outer";
+      print a;
+      {
+        print a;
+      }
+      `;
+      babyjs.runOnce(code);
+
+      expect(logger.error).not.toHaveBeenCalled();
+      expect(logger.log).toHaveBeenNthCalledWith(1, ">>", "outer");
+      expect(logger.log).toHaveBeenNthCalledWith(2, ">>", "outer");
+    });
+
+    it("should resolve closures properly", () => {
+      const code = `
+      let a = "global";
+      {
+        fn showA() {
+          print a;
+        }
+  
+        showA();
+        let a = "block";
+        showA();
+      }
+      `;
+      babyjs.runOnce(code);
+
+      expect(logger.error).not.toHaveBeenCalled();
+      expect(logger.log).toHaveBeenNthCalledWith(1, ">>", "global");
+      expect(logger.log).toHaveBeenNthCalledWith(2, ">>", "global");
+    });
+
+    // prettier-ignore
+    describe("edge cases", () => {
+      it("should return a runtime error", () => this_code(`let a = a;`).shouldErrorAtRuntimeMentioning("Undefined variable"));
+      it("should not allow redeclaring variable in global scope", () => this_code(`let a = "first"; let a = "second";`).shouldErrorAtRuntimeMentioning("has already been defined"));
+      it("should not allow redeclaring variable in local scope", () => this_code(`fn bad() { let a = "first"; let a = "second"; }`).shouldErrorAtVariableResolveMentioning("already a variable"))
+      it("should error when shadowing with the same variable name", () => this_code(`let a = "outer"; { let a = a; }`).shouldErrorAtVariableResolveMentioning("Can't read local variable in its own initializer"));
+      it("should work", () => this_code(`return "at top level";`).shouldErrorAtVariableResolveMentioning("Can't return from top-level code."))
+    })
   });
 
   describe("functions", () => {

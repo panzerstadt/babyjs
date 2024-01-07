@@ -28,6 +28,7 @@ const statementIsVariableExpression = (
 export class Interpreter {
   private loop_upper_bound = 10_000;
   readonly globals = new Environment();
+  readonly locals = new Map<AnyExpr, number>();
   private environment = this.globals;
   logger: LoggerType = console;
 
@@ -45,6 +46,12 @@ export class Interpreter {
   public setLogger(newLogger: LoggerType) {
     this.logger = newLogger;
     this.environment.setLogger(newLogger);
+  }
+
+  // for variable resolver, to store a "side-table" of a data table per tree node
+  resolve(expr: AnyExpr, depth: number) {
+    this.locals.set(expr, depth);
+    // console.log(`locals has been set.`, this.locals);
   }
 
   public interpret(statements: AnyStmt[], debug?: boolean): RuntimeError | undefined {
@@ -313,12 +320,30 @@ export class Interpreter {
   }
 
   public visitVariableExpr(expr: Expr["Variable"]): Object {
-    return this.environment.get(expr.name);
+    return this.lookUpVariable(expr.name, expr);
+  }
+
+  private lookUpVariable(name: Token, expr: AnyExpr) {
+    const distance = this.locals.get(expr);
+    // console.log("distance for expr", distance, this.environment);
+    if (distance !== null && distance !== undefined) {
+      return this.environment.getAt(distance, name.lexeme);
+    } else {
+      // console.log(`interpreter getting global variable "${name.lexeme}" at dist: ${distance}`);
+      return this.globals.get(name);
+    }
   }
 
   public visitAssignExpr(expr: Expr["Assign"]): Object {
     const value = this.evaluate(expr.value);
-    this.environment.assign(expr.name, value);
+    const distance = this.locals.get(expr);
+    if (distance !== null && distance !== undefined) {
+      // console.log("interpreter assigning local", distance, expr.name, value);
+      this.environment.assignAt(distance, expr.name, value);
+    } else {
+      // console.log("interpreter assigning global", distance, expr.name, value);
+      this.globals.assign(expr.name, value);
+    }
     return value;
   }
 
