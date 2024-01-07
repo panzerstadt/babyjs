@@ -105,15 +105,7 @@ export class VariableResolver {
   }
 
   public visitLetStmt(stmt: Stmt["Let"], debug?: boolean) {
-    console.log("at visit let stmt", stmt);
-    this.scopes.view("map");
-
     this.declare(stmt.name);
-    // nope this is corect, all stmt.initializers are done properly
-    // console.log(
-    //   "maybe statement initialize is not actualy not null but my symbol?",
-    //   stmt.initializer
-    // );
     if (stmt.initializer !== null) {
       this._resolveExpr(stmt.initializer);
     }
@@ -199,7 +191,6 @@ export class VariableResolver {
     if (this.scopes.isEmpty()) return;
 
     const scope = this.scopes.peek();
-    // console.log(`decl: ${name.lexeme}, scope: ${scope}`);
     if (scope!.has(name.lexeme)) {
       this._error.error(name, `There is already a variable with name ${name.lexeme} in this scope`);
     }
@@ -246,9 +237,6 @@ export class VariableResolver {
   }
 
   private visitVariableExpr(expr: Expr["Variable"]) {
-    // console.log("at visit variable expr", expr);
-    // console.log("scope here is", this.scopes.peek());
-    // this.scopes.view("map"); // i visit the variable 3 times. first
     if (!this.scopes.isEmpty() && this.scopes.peek()!.get(expr.name.lexeme) === false) {
       this._error.error(
         expr.name,
@@ -256,7 +244,6 @@ export class VariableResolver {
       );
     }
 
-    // console.log("visiting variable expr", expr.name, expr);
     this.resolveLocal(expr, expr.name);
     return null;
   }
@@ -270,12 +257,8 @@ export class VariableResolver {
      * | btm  | --> 'innermost'
      *  ------
      */
-    // console.log("resolveLocal start!!!!");
-    // this.scopes.view("map");
-
     for (let i = 0; i < this.scopes.size(); i++) {
       if (this.scopes.elementAt(i)?.has(name.lexeme)) {
-        console.log(`found ${name.lexeme} at idx: ${i}`, this.scopes.elementAt(i));
         this.interpreter.resolve(expr, i);
         return;
       }
@@ -283,11 +266,7 @@ export class VariableResolver {
   }
 
   public visitAssignExpr(expr: Expr["Assign"]) {
-    // console.log("at visit assign expr", expr);
-    // this.scopes.view("map");
-
     this._resolveExpr(expr.value);
-    // console.log("assign expr resolve local", expr, expr.name);
     this.resolveLocal(expr, expr.name);
     return null;
   }

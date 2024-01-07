@@ -51,7 +51,6 @@ export class Interpreter {
   // for variable resolver, to store a "side-table" of a data table per tree node
   resolve(expr: AnyExpr, depth: number) {
     this.locals.set(expr, depth);
-    // console.log(`locals has been set.`, this.locals);
   }
 
   public interpret(statements: AnyStmt[], debug?: boolean): RuntimeError | undefined {
