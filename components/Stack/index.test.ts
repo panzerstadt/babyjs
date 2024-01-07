@@ -45,12 +45,5 @@ test("fancy stack", () => {
   list.push(new Map<string, boolean>().set("two", true));
   list.push(new Map<string, boolean>().set("three", false));
 
-  list.view((item: Map<string, boolean>) => {
-    let row = "";
-    item.forEach((v, k) => {
-      row += `k:${k}, v:${v}`;
-    });
-
-    return row;
-  });
+  list.view("map");
 });
