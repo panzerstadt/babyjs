@@ -18,7 +18,21 @@ export class Stack<T> {
   size() {
     return this.length;
   }
-  get(idx: number): T | undefined {
+
+  /**
+   * elementAt -> starts from top of stack, or head of linkedlist, or end of array
+   * get       -> starts from bottom of stack, of tail of linkedlist, or start of array, ~= my_array[i]
+   *
+   * e.g. btm, for a stack like the following:
+   * | top  | [0] --> top most (i.e. what you get from .peek())
+   * | mid1 | [1]
+   * | mid2 | [2]
+   * | btm  | [3] --> 'innermost'
+   *  ------
+   * @param idx index starting from the top of the stack
+   * @returns item found at idx of the stack, starting from top of the stack downward
+   */
+  elementAt(idx: number): T | undefined {
     if (idx < 0 || idx >= this.length) {
       return undefined;
     }
