@@ -116,6 +116,19 @@ export class ParseError {
     this.logger.error("parse", "-----------------END-------------------");
   }
 }
+export class VariableResolveError extends ParseError {
+  printErrors() {
+    this.logger.error(
+      "resolve-variable",
+      "RESOLVER ERROR: Errors found when resolving variables in the file."
+    );
+    this.logger.error("resolve-variable", "----------------START------------------");
+    this.errors.forEach((e) => {
+      this.logger.error("resolve-variable", e);
+    });
+    this.logger.error("resolve-variable", "-----------------END-------------------");
+  }
+}
 
 // Errors in interpreter are DYNAMIC errors
 export class RuntimeError extends Error {
