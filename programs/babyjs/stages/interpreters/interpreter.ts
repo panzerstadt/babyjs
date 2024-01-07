@@ -106,20 +106,6 @@ export class Interpreter {
     return null;
   }
 
-  executeBlock(statements: AnyStmt[], environment: Environment, debug?: boolean) {
-    const previous = this.environment;
-    try {
-      this.environment = environment;
-      debug && this.environment.debugPrintEnvironment("newEnv");
-
-      for (const statement of statements) {
-        this.execute(statement, debug);
-      }
-    } finally {
-      this.environment = previous;
-    }
-  }
-
   // like printAST's process() method, is recursive
   private evaluate(expr: AnyExpr): Object {
     switch (expr.type) {
@@ -438,6 +424,20 @@ export class Interpreter {
     blockEnv.setLogger(this.logger);
 
     this.executeBlock(stmt.statements, blockEnv, debug);
+  }
+
+  executeBlock(statements: AnyStmt[], environment: Environment, debug?: boolean) {
+    const previous = this.environment;
+    try {
+      this.environment = environment;
+      debug && this.environment.debugPrintEnvironment("newEnv");
+
+      for (const statement of statements) {
+        this.execute(statement, debug);
+      }
+    } finally {
+      this.environment = previous;
+    }
   }
 
   private _debugStatement(stmt: AnyStmt) {
