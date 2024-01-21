@@ -8,64 +8,6 @@ import { MAX_PARAMETER_COUNT } from "../constants";
 // TODO: fun extra challenge: support IF x THEN y ELSE z
 // which is different from js ternaries (also included) as well as python ternaries (expr1 if condition else expr2)
 
-/*
-Scanner = reads characters left to right
-Parser = reads Tokens left to right
-Higher Precedence = inner layer (e.g. factor has higher precedence than term
-                    because factor is the inner call of term
-read precedence like top = lowest, bottom = highest
-------
-Expression Grammar for this parser in Backus-Naur Form (BNF) (subset of statement grammar)
-expression     → assignment ;
-assignment     → IDENTIFIER "=" assignment
-               | logic_or ;
-logic_or       → logic_and ( "or" logic_and )* ;
-logic_and      → ternary ( "and" ternary )* ;
-ternary        → equality ( "?" expression ":" ternary )* ;
-equality       → comparison ( ( "!=" | "==" ) comparison )* ;
-comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
-term           → factor ( ( "-" | "+" ) factor )* ;
-factor         → unary ( ( "/" | "*" ) unary )* ;
-unary          → ( "!" | "-" ) unary | call ;
-call           → primary ( "(" arguments? ")" )* ;
-arguments      → expression ( "," expression )* ;
-primary        → NUMBER | STRING | "true" | "false"
-               | "(" expression ")" | IDENTIFIER ;
--------
-Statement Grammar for this parser (BNF) (superset)
-program        → declaration* EOF ;
-
-declaration    → funDecl
-               | varDecl
-               | statement ;
-
-statement      → exprStmt
-               | forStmt
-               | ifStmt
-               | printStmt
-               | returnStmt
-               | whileStmt
-               | block ;
-
-exprStmt       → expression ";" ;
-forStmt        → "for" "(" (varDecl | exprStmt | ";"" ) expression? ";" expression? ")" statement  // for loops are considered syntactic sugar, since you can actually do what for loops to with pieces of other statements
-               | "for" "(" varDecl "in" expression ( ".." | "..=" ) expression ")" statement
-whileStmt      → "while" "(" expression ")" statement ;
-ifStmt         → "if" "(" expression ")" statement
-                 ( "else" statement )? ;
-printStmt      → "print" expression ";" ;   
-returnStmt     → "return" expression? ";" ;
-block          → "{" declaration* "}" ;
-varDecl        → "let" IDENTIFIER ( "=" expression )? ";"
-funDecl        → "fn" function ;
-function       → IDENTIFIER "(" parameters? ")" block ;
-parameters     → IDENTIFIER ( "," IDENTIFIER )* ;
-
-program represents a complete Lox script/repl entry.
-a Program = a list of statements followed by an End-Of-File token
--------
-Btw, (BNF) attempt for english: https://english.stackexchange.com/a/60761
-*/
 export class Parser {
   private static ParseError = class extends Error {};
   private tokens: Token[];
