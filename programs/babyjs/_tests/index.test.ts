@@ -862,4 +862,21 @@ describe("babyjs", () => {
       expect(logger.log).toHaveBeenLastCalledWith(">>", "async call complete!");
     });
   });
+
+  describe("classes", () => {
+    it("can be declared", () => {
+      const code = `class DevonshireCream {
+        serveOn() {
+          return "scones";
+        }
+      }
+      
+      print DevonshireCream;`;
+
+      babyjs.runOnce(code);
+
+      expect(logger.error).not.toHaveBeenCalled();
+      expect(logger.log).toHaveBeenLastCalledWith(">>", "<class DevonshireCream>");
+    });
+  });
 });

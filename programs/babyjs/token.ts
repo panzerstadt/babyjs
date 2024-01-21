@@ -42,6 +42,7 @@ export const keywords = {
   or: TokenType.OR,
   while: TokenType.WHILE,
   fn: TokenType.FUNC,
+  class: TokenType.CLASS,
   for: TokenType.FOR,
   in: TokenType.IN,
   return: TokenType.RETURN,

@@ -31,6 +31,16 @@ const functionStmt = (name: Token, params: Token[], body: AnyStmt[]): Function =
   return { type: "function", name, params, body };
 };
 
+interface Class {
+  readonly type: "class";
+  readonly name: Token;
+  readonly methods: Function[];
+}
+
+const classStmt = (name: Token, methods: Function[]): Class => {
+  return { type: "class", name, methods };
+};
+
 interface If {
   readonly type: "if";
   readonly condition: AnyExpr;
@@ -99,11 +109,22 @@ const rangeFor = (
   return { type: "rangeFor", initializerRef, start, end, inclusive, body };
 };
 
-export type AnyStmt = Expression | Function | If | Print | Return | Let | Block | While | RangeFor;
+export type AnyStmt =
+  | Expression
+  | Function
+  | Class
+  | If
+  | Print
+  | Return
+  | Let
+  | Block
+  | While
+  | RangeFor;
 export interface Stmt {
   Expression: Expression;
   While: While;
   Function: Function;
+  Class: Class;
   If: If;
   Print: Print;
   Return: Return;
@@ -115,6 +136,7 @@ export const Stmt = {
   Expression: expression,
   While: whileexpr,
   Function: functionStmt,
+  Class: classStmt,
   If: ifexpr,
   Print: print,
   Return: returnStmt,

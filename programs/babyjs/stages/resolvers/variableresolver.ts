@@ -84,6 +84,8 @@ export class VariableResolver {
         return this.visitReturnStmt(stmt, debug);
       case "function":
         return this.visitFunctionStmt(stmt, debug);
+      case "class":
+        return this.visitClassStmt(stmt, debug);
       case "let":
         return this.visitLetStmt(stmt, debug);
       case "block":
@@ -109,6 +111,12 @@ export class VariableResolver {
     if (stmt.initializer !== null) {
       this._resolveExpr(stmt.initializer);
     }
+    this.define(stmt.name);
+    return null;
+  }
+
+  public visitClassStmt(stmt: Stmt["Class"], debug?: boolean) {
+    this.declare(stmt.name);
     this.define(stmt.name);
     return null;
   }

@@ -24,7 +24,8 @@ primary        → NUMBER | STRING | "true" | "false"
 Statement Grammar for this parser (BNF) (superset)
 program        → declaration* EOF ;
 
-declaration    → funDecl
+declaration    → classDecl
+               | funDecl
                | varDecl
                | statement ;
 
@@ -46,6 +47,7 @@ printStmt      → "print" expression ";" ;
 returnStmt     → "return" expression? ";" ;
 block          → "{" declaration* "}" ;
 varDecl        → "let" IDENTIFIER ( "=" expression )? ";"
+classDecl      → "class" IDENTIFIER "{" function* "}" ;
 funDecl        → "fn" function ;
 function       → IDENTIFIER "(" parameters? ")" block ;
 parameters     → IDENTIFIER ( "," IDENTIFIER )* ;

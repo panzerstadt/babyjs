@@ -14,6 +14,7 @@ import { Return } from "../../return";
 import { Async } from "../../functions/foreignfunctions/dummyasync";
 import { Csv, Review } from "../../functions/foreignfunctions/csv";
 import { Help } from "../../functions/foreignfunctions/help";
+import { BabyjsClass } from "../../classes/baseclass";
 
 const statementIsVariableExpression = (
   statements: AnyStmt[]
@@ -95,6 +96,8 @@ export class Interpreter {
         return this.visitReturnStmt(stmt, debug);
       case "function":
         return this.visitFunctionStmt(stmt, debug);
+      case "class":
+        return this.visitClassStmt(stmt, debug);
       case "let":
         return this.visitLetStmt(stmt, debug);
       case "block":
@@ -421,6 +424,22 @@ export class Interpreter {
     }
 
     throw new Return(value);
+  }
+
+  /**
+   * We declare the class’s name in the current environment.
+   * Then we turn the class syntax node into a LoxClass, the
+   * runtime representation of a class. We circle back and store
+   * the class object in the variable we previously declared.
+   *
+   * That two-stage variable binding process allows references
+   * to the class inside its own methods.
+   */
+  public visitClassStmt(stmt: Stmt["Class"], debug?: boolean) {
+    this.environment.define(stmt.name.lexeme, _UNINITIALIZED);
+    const klass = new BabyjsClass(stmt.name.lexeme);
+    this.environment.assign(stmt.name, klass);
+    return null;
   }
 
   public visitFunctionStmt(stmt: Stmt["Function"], debug?: boolean): void {
